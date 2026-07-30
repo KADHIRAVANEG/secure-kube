@@ -10,7 +10,7 @@ A CIS-aligned, zero-trust Kubernetes cluster provisioned via IaC — no manual s
 
 ## Container image
 
-No local tool installation required — pull the image and run:
+>No local tool installation required — pull the image and run:
 
 ```bash
 docker run --rm -it \
