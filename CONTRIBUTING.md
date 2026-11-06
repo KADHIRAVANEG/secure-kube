@@ -69,7 +69,7 @@ docker run --rm -it \
 ```bash
 git clone https://github.com/<your-username>/secure-kube
 cd secure-kube
-git remote add upstream https://github.com/JOKER-53/secure-kube
+git remote add upstream https://github.com/KADHIRAVANEG/secure-kube
 ```
 
 ### Deploy locally

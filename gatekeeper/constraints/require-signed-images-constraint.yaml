@@ -29,5 +29,5 @@ spec:
       - monitoring
   parameters:
     allowedSigners:
-      - "https://github.com/JOKER-53/secure-kube/.github/workflows/release.yaml@refs/heads/main"
+      - "https://github.com/KADHIRAVANEG/secure-kube/.github/workflows/release.yaml@refs/heads/main"
   enforcementAction: warn   # change to "deny" with cosign-gatekeeper-provider installed

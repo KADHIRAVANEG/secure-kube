@@ -1,9 +1,9 @@
 # SecureKube
 
-![CI](https://github.com/JOKER-53/secure-kube/actions/workflows/ci.yaml/badge.svg)
-![Release](https://github.com/JOKER-53/secure-kube/actions/workflows/release.yaml/badge.svg)
-![GitHub release](https://img.shields.io/github/v/release/JOKER-53/secure-kube)
-![License](https://img.shields.io/github/license/JOKER-53/secure-kube)
+![CI](https://github.com/KADHIRAVANEG/secure-kube/actions/workflows/ci.yaml/badge.svg)
+![Release](https://github.com/KADHIRAVANEG/secure-kube/actions/workflows/release.yaml/badge.svg)
+![GitHub release](https://img.shields.io/github/v/release/KADHIRAVANEG/secure-kube)
+![License](https://img.shields.io/github/license/KADHIRAVANEG/secure-kube)
 ![Security scan](https://img.shields.io/badge/security-trivy-blue)
 
 A CIS-aligned, zero-trust Kubernetes cluster provisioned via IaC — no manual security configuration required, 100% local, zero cloud cost.

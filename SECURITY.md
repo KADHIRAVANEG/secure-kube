@@ -13,7 +13,7 @@
 **Do not open a public GitHub issue for security vulnerabilities.**
 
 Report privately via GitHub's built-in security advisory:
-1. Go to `https://github.com/JOKER-53/secure-kube/security/advisories`
+1. Go to `https://github.com/KADHIRAVANEG/secure-kube/security/advisories`
 2. Click **New draft security advisory**
 3. Fill in the details and submit
 

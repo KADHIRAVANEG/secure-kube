@@ -81,5 +81,5 @@ CMD ["make", "help"]
 
 LABEL org.opencontainers.image.title="SecureKube" \
       org.opencontainers.image.description="CIS-aligned zero-trust Kubernetes cluster via IaC" \
-      org.opencontainers.image.source="https://github.com/JOKER-53/secure-kube" \
+      org.opencontainers.image.source="https://github.com/KADHIRAVANEG/secure-kube" \
       org.opencontainers.image.licenses="MIT"
