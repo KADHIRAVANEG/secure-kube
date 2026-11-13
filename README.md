@@ -39,8 +39,45 @@ Default Kubernetes installations ship with zero network isolation, no pod securi
 - Zero-trust networking via **default-deny NetworkPolicy** across all namespaces
 - **Least-privilege RBAC** — no wildcard permissions, no cluster-admin for workloads
 - **Pod security standards** — no root containers, no privileged pods, read-only root filesystem, dropped capabilities, no privileged ports
-- **Audit logging** and runtime policy enforcement via OPA Gatekeeper (8 constraints) + Falco
+- **Audit logging** and runtime policy enforcement via OPA Gatekeeper (9 constraints) + Falco
 - **One-command deployment** — `make deploy`, entirely on `kind` (local), no cloud account, no API keys, no billing
+
+## Visual Showcase & Live Verification
+
+The entire SecureKube stack is fully functional on local Kind clusters, enforced by admission controllers, monitored via eBPF runtime probes, and synced declaratively via GitOps:
+
+### 1. GitOps Continuous Reconciliation (Argo CD)
+Every layer — from Calico CNI and Gatekeeper constraints to NetworkPolicies, RBAC, and workload deployments — is monitored for drift and managed declaratively via Argo CD.
+
+![Argo CD GitOps Dashboard](docs/screenshots/argocd-dashboard.png)
+
+---
+
+### 2. Unified Security & Observability Dashboard (Grafana)
+Real-time correlation of Gatekeeper policy violations, Falco runtime threat events, cluster resource consumption, and network flow metrics in a single pane of glass.
+
+![Grafana Unified Security Dashboard](docs/screenshots/grafana-dashboard.png)
+
+---
+
+### 3. Runtime Threat Detection & Audit Telemetry (Falco Sidekick)
+Falco continuously inspects kernel syscalls via modern eBPF. Anomalies, shell spawns inside containers, and sensitive directory access are streamed to Falco Sidekick UI and Redis.
+
+![Falco Sidekick UI](docs/screenshots/falco-sidekick-ui.png)
+
+---
+
+### 4. Admission Control & Policy Enforcement (`make test`)
+Automated test suite validates both negative test cases (8/8 non-compliant pods blocked by OPA Gatekeeper and Pod Security Standards) and positive test cases (hardened microservice admitted cleanly).
+
+![Policy Enforcement Tests](docs/screenshots/terminal-policy-tests.png)
+
+---
+
+### 5. Multi-Node Cluster Health & Component Status (`make status`)
+Single-command overview of the 3-node Kind cluster, Calico networking, Gatekeeper constraint enforcement audit counts, and active services across all security namespaces.
+
+![Cluster and Component Status](docs/screenshots/terminal-cluster-status.png)
 
 ## Architecture
 
@@ -54,13 +91,16 @@ Default Kubernetes installations ship with zero network isolation, no pod securi
 3. RBAC hardening            Least privilege, no wildcards
         |
         v
-4. Policy enforcement        OPA Gatekeeper (8 constraints) + Pod Security Standards
+4. Policy enforcement        OPA Gatekeeper (9 constraints) + Pod Security Standards
         |
         v
 5. Runtime monitoring        Falco (modern eBPF driver) + audit logging
         |
         v
-6. CIS validation             kube-bench score reported
+6. Observability & GitOps    kube-prometheus-stack + Grafana + Argo CD
+        |
+        v
+7. CIS validation             kube-bench score reported
         |
         v
    Cluster ready -- secure by default
@@ -84,12 +124,16 @@ Every policy layer (NetworkPolicy, RBAC, Pod Security Standards, Gatekeeper cons
 ```
 gitops/
 └── apps/
-    ├── project.yaml                  Argo CD AppProject (scoped source/destination allow-list)
-    ├── network-policies-app.yaml     watches kustomize/base/network-policies/
-    ├── rbac-app.yaml                 watches kustomize/base/rbac/
-    ├── pod-security-app.yaml         watches kustomize/base/pod-security/
-    ├── gatekeeper-templates-app.yaml watches gatekeeper/constraint-templates/
-    └── gatekeeper-constraints-app.yaml watches gatekeeper/constraints/
+    ├── project.yaml                     Argo CD AppProject (scoped source/destination allow-list)
+    ├── calico-system-app.yaml           Calico CNI infrastructure application
+    ├── gatekeeper-system-app.yaml       Gatekeeper controller Helm chart
+    ├── gatekeeper-templates-app.yaml    OPA ConstraintTemplates
+    ├── gatekeeper-constraints-app.yaml  OPA Constraints (cluster-wide enforcement)
+    ├── falco-system-app.yaml            Falco & Sidekick UI Helm chart
+    ├── network-policies-app.yaml        Kustomize default-deny & DNS-allow network policies
+    ├── pod-security-app.yaml            PSA namespace admission profiles
+    ├── rbac-app.yaml                    Workload runtime least-privilege RBAC
+    └── secure-app.yaml                  Hardened reference application
 ```
 
 Argo CD is installed as part of `make deploy`. Once up:
@@ -123,13 +167,17 @@ Edit `config.env` to change the cluster name or toggle Calico/Falco before deplo
 ### Useful commands
 
 ```bash
-make status      # health of every component + active constraints + recent violations
-make test        # negative tests (insecure pods rejected) + positive test (secure pod allowed)
-make bench       # CIS Benchmark score via kube-bench
-make dashboard   # port-forward Falco Sidekick UI to localhost:2802
-make logs        # tail live Falco alerts
-make clean-logs  # remove stale kube-bench/test job leftovers
-make destroy     # tear down everything
+make status               # health of every component + active constraints + recent violations
+make test                 # negative tests (insecure pods rejected) + positive test (secure pod allowed)
+make bench                # CIS Benchmark score via kube-bench
+make dashboard            # port-forward Falco Sidekick UI to localhost:2802
+make dashboard-argocd     # port-forward Argo CD UI to localhost:8080 (prints admin password)
+make dashboard-grafana    # port-forward Grafana to localhost:3000 (prints admin password)
+make dashboard-prometheus # port-forward Prometheus to localhost:9090
+make sync-all             # trigger Argo CD sync across all registered applications
+make logs                 # tail live Falco alerts
+make clean-logs           # remove stale kube-bench/test job leftovers
+make destroy              # tear down everything
 ```
 
 ### Try the example workloads yourself
@@ -152,23 +200,32 @@ securekube/
 │   ├── kind-config.yaml             static kind cluster config: audit logging, hardened API server flags
 │   └── audit-policy.yaml            CIS 3.2.x audit policy
 ├── kustomize/base/
-│   ├── network-policies/            default-deny + DNS-allow NetworkPolicy
+│   ├── network-policies/            default-deny + DNS-allow NetworkPolicy & egress-templates
+│   │   ├── egress-templates/        per-workload egress templates (database, external API)
+│   │   └── kustomization.yaml
 │   ├── rbac/                        least-privilege Role/RoleBinding, no-wildcard rules
 │   └── pod-security/                PSA "restricted" labels per namespace
 ├── gatekeeper/
 │   ├── constraint-templates/        Rego: no-root, no-privileged, readonly-rootfs,
 │   │                                 no-hostpath, no-host-namespaces, require-resources,
-│   │                                 allowed-repos, capabilities-and-ports
+│   │                                 allowed-repos, capabilities-and-ports, require-signed-images
 │   └── constraints/                 activation of each template cluster-wide
+├── gitops/apps/                     Argo CD AppProject and 9 declarative application manifests
 ├── helm/
 │   ├── gatekeeper-values.yaml       fail-open webhook (see docs/architecture.md), 3 replicas
 │   └── falco-values.yaml            modern_ebpf driver, JSON output, sidekick UI
+├── observability/
+│   └── dashboards/                  Grafana JSON dashboards (unified security & cluster overview)
 ├── examples/
 │   ├── secure-app.yaml              passes every policy layer -- proves the "happy path" works
-│   └── insecure-apps.yaml           8 pods, each violating exactly one constraint
-├── .github/workflows/ci.yaml        spins up kind, deploys, validates, tears down
-├── scripts/test-policies.sh         negative + positive policy tests
-└── docs/architecture.md             the real reasoning behind every non-obvious decision
+│   ├── insecure-apps.yaml           8 pods, each violating exactly one constraint
+│   └── three-tier-app.yaml          reference multi-tier workload with isolated network policies
+├── scripts/
+│   └── test-policies.sh             negative + positive policy tests
+├── docs/
+│   ├── architecture.md              the real reasoning behind every non-obvious decision
+│   └── screenshots/                 live UI & terminal verification captures
+└── .github/workflows/ci.yaml        spins up kind, deploys, validates, tears down
 ```
 
 ## Known limitations (read this before treating it as "done")

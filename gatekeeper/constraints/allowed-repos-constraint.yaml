@@ -7,7 +7,7 @@ spec:
     kinds:
       - apiGroups: [""]
         kinds: ["Pod"]
-    excludedNamespaces: ["kube-system", "gatekeeper-system", "falco", "calico-system", "argocd", "monitoring"]
+    excludedNamespaces: ["kube-system", "gatekeeper-system", "falco", "calico-system", "argocd", "monitoring", "local-path-storage"]
   parameters:
     # Adjust to your org's real registries. docker.io/library is here
     # only so the bundled examples/ workloads work out of the box —

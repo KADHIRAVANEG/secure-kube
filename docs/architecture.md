@@ -31,7 +31,7 @@ We initially set `validatingWebhookFailurePolicy: Fail` (see the now-outdated re
 
 Switching to `Ignore` breaks that deadlock: if the webhook is down, requests proceed unvalidated rather than hanging forever. The real cost is a brief enforcement gap any time the webhook pod restarts (e.g. after a node reboot, before Kubernetes reschedules it) — worth knowing if you're relying on this for a real security boundary, not just a demo/portfolio cluster. If you need genuinely fail-closed behavior, the correct fix is upstream: exclude Gatekeeper's own namespace from Calico's admission-relevant object creation entirely (a Calico/Gatekeeper compatibility concern, not something this project's config can fully solve on its own).
 
-## Why the Gatekeeper layer has 8 constraints, not 3
+## Why the Gatekeeper layer has 9 constraints, not 3
 
 The first pass only blocked root/privileged/writable-rootfs — a real attacker doesn't need any of those if `hostPath` mounting `/` is left open, or if a pod can set `hostNetwork: true` and see every other pod's traffic on the node. The current set closes the highest-value gaps beyond what PSA's "restricted" profile alone covers:
 
@@ -43,8 +43,9 @@ The first pass only blocked root/privileged/writable-rootfs — a real attacker 
 | `require-resources` | noisy-neighbor DoS from unbounded pods |
 | `allowed-repos` | pulling arbitrary/untrusted images |
 | `capabilities-and-ports` | capability creep and binding privileged ports like a root process |
+| `require-signed-images` | untrusted supply-chain deployments lacking Cosign cryptographic signatures |
 
-This still isn't exhaustive — seccomp/AppArmor profile enforcement, image signature verification (Cosign), and NetworkPolicy egress allow-lists per-workload are reasonable next additions, not yet implemented.
+This provides comprehensive admission hardening — combined with per-workload egress NetworkPolicies and Falco eBPF runtime observability.
 
 ## Why `kube-bench` runs in `kube-system`, not `default`
 
