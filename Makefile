@@ -11,7 +11,7 @@ TF_VAR_enable_network_policy_cni = $(strip $(ENABLE_CALICO))
 export TF_VAR_cluster_name TF_VAR_enable_network_policy_cni
 
 help: ## Show this help
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-18s\033[0m %s\n", $$1, $$2}'
+	@grep -h -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-22s\033[0m %s\n", $$1, $$2}'
 
 deploy: cluster policies gatekeeper falco argocd observability test ## Full one-command deploy (kind, local)
 	@echo ""
@@ -124,6 +124,8 @@ dashboard-grafana: ## Port-forward Grafana to localhost:3000
 dashboard-prometheus: ## Port-forward Prometheus to localhost:9090
 	@echo "Opening Prometheus at http://localhost:9090 (Ctrl+C to stop)"
 	kubectl port-forward -n monitoring svc/kube-prometheus-stack-prometheus 9090:9090
+
+test: ## Step 6: Test policies (negative + positive)
 	./scripts/test-policies.sh
 
 verify: test ## Alias for 'test' (back-compat)
