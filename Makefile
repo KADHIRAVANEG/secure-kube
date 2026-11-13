@@ -48,7 +48,7 @@ gatekeeper: ## Step 4: Install OPA Gatekeeper + all constraint templates + const
 	@echo "→ Waiting for CRDs to register..."
 	sleep 8
 	kubectl apply -f gatekeeper/constraints/
-	@echo "→ Gatekeeper installed — 6 constraints enforced: no-root, no-privileged, readonly-rootfs, no-hostpath, no-host-namespaces, require-resources, allowed-repos, capabilities-and-ports"
+	@echo "→ Gatekeeper installed — 9 constraints enforced: no-root, no-privileged, readonly-rootfs, no-hostpath, no-host-namespaces, require-resources, allowed-repos, capabilities-and-ports, require-signed-images"
 
 falco: ## Step 5: Install Falco for runtime threat detection + audit logging
 ifeq ($(strip $(ENABLE_FALCO)),true)
