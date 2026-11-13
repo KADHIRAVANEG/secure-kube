@@ -1,0 +1,21 @@
+# NIST SP 800-190 §4.4.1 — Require explicit CPU/Memory Requests and Limits
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: securekube-cel-require-resources
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  validations:
+    - expression: |
+        !has(object.spec.containers) || object.spec.containers.all(c,
+          has(c.resources) &&
+          has(c.resources.requests) && has(c.resources.requests.cpu) && has(c.resources.requests.memory) &&
+          has(c.resources.limits) && has(c.resources.limits.cpu) && has(c.resources.limits.memory)
+        )
+      message: "[CEL:require-resources] All containers must define resources.requests (cpu, memory) and resources.limits (cpu, memory). Remediation: run 'make harden FILE=<manifest>'."

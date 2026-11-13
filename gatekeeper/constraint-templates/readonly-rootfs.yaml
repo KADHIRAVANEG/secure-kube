@@ -17,7 +17,7 @@ spec:
         violation[{"msg": msg}] {
           c := input_containers[_]
           not c.securityContext.readOnlyRootFilesystem == true
-          msg := sprintf("container <%v> must set securityContext.readOnlyRootFilesystem = true", [c.name])
+          msg := sprintf("container <%v> must set securityContext.readOnlyRootFilesystem = true. Remediation: add 'securityContext.readOnlyRootFilesystem: true' and mount an emptyDir at /tmp if temporary writes are needed, or run 'make harden FILE=<manifest>'", [c.name])
         }
 
         input_containers[c] {

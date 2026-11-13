@@ -1,0 +1,26 @@
+# Pod Security Standards (Restricted) — Drop ALL capabilities & disallow privileged ports (<1024)
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: securekube-cel-capabilities-and-ports
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  validations:
+    - expression: |
+        !has(object.spec.containers) || object.spec.containers.all(c,
+          has(c.securityContext) && has(c.securityContext.capabilities) &&
+          has(c.securityContext.capabilities.drop) &&
+          c.securityContext.capabilities.drop.exists(d, d == "ALL")
+        )
+      message: "[CEL:drop-all-capabilities] Containers must drop ALL capabilities (securityContext.capabilities.drop: ['ALL']). Remediation: run 'make harden FILE=<manifest>'."
+    - expression: |
+        !has(object.spec.containers) || object.spec.containers.all(c,
+          !has(c.ports) || c.ports.all(p, !has(p.containerPort) || p.containerPort >= 1024)
+        )
+      message: "[CEL:privileged-ports] Containers cannot bind privileged ports < 1024. Remediation: bind port >= 1024 (e.g. 8080) and expose via a Service."

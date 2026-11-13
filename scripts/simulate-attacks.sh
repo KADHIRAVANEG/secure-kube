@@ -40,7 +40,11 @@ EOF
 
   if echo "${out}" | grep -Eqi "forbidden|denied|violates PodSecurity|webhook"; then
     echo -e "  ${GREEN}✓ BLOCKED AT ADMISSION:${NC} Malicious pod creation rejected"
-    if echo "${out}" | grep -qi "gatekeeper.sh"; then
+    if echo "${out}" | grep -qi "ValidatingAdmissionPolicy"; then
+      local cel_rule
+      cel_rule=$(echo "${out}" | grep -o "\[CEL:[a-zA-Z0-9_-]*\]" | head -n 1 || echo "[CEL]")
+      echo -e "  ${BLUE}Defense Layer:${NC} Kubernetes Native In-Tree CEL (${cel_rule})"
+    elif echo "${out}" | grep -qi "gatekeeper.sh"; then
       local rule
       rule=$(echo "${out}" | grep -E "denied the request:" | grep -o "\[[a-zA-Z0-9_-]*\]" | head -n 1 || echo "")
       if [[ -z "${rule}" ]]; then

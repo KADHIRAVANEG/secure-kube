@@ -17,5 +17,5 @@ spec:
         violation[{"msg": msg}] {
           v := input.review.object.spec.volumes[_]
           v.hostPath
-          msg := sprintf("volume <%v> uses hostPath, which is not allowed", [v.name])
+          msg := sprintf("volume <%v> uses hostPath, which is not allowed. Remediation: replace hostPath with PersistentVolumeClaim or emptyDir volume", [v.name])
         }

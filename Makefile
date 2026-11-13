@@ -2,7 +2,8 @@ include config.env
 export
 
 .PHONY: deploy deploy-light destroy cluster policies gatekeeper falco argocd observability verify test bench \
-        attack secrets-init secrets-encrypt secrets-apply \
+        attack secrets-init secrets-encrypt secrets-apply harden generate-network-policy vap secrets-eso \
+        cloud-eks cloud-gke \
         status logs clean-logs dashboard dashboard-argocd dashboard-grafana dashboard-prometheus sync-policies sync-rbac \
         sync-gatekeeper sync-pod-security sync-helm-apps sync-all clean help
 
@@ -33,9 +34,10 @@ cluster: ## Step 1: Provision the kind cluster via Terraform
 	cd terraform/kind && terraform init -input=false && terraform apply -auto-approve
 	@echo "→ Cluster '$(CLUSTER_NAME)' provisioned ($(CONTROL_PLANE_COUNT) control-plane, $(WORKER_COUNT) worker)"
 
-policies: ## Step 2-3: Apply NetworkPolicy, RBAC, Pod Security Standards
+policies: ## Step 2-3: Apply NetworkPolicy, RBAC, Pod Security Standards, and CEL Admission
 	kubectl apply -k kustomize/base
-	@echo "→ Default-deny NetworkPolicy, least-privilege RBAC, and PSS labels applied"
+	kubectl apply -k kustomize/base/vap
+	@echo "→ Default-deny NetworkPolicy, least-privilege RBAC, PSS labels, and in-tree CEL policies applied"
 
 gatekeeper: ## Step 4: Install OPA Gatekeeper + all constraint templates + constraints
 	helm repo add gatekeeper https://open-policy-agent.github.io/gatekeeper/charts --force-update
@@ -160,6 +162,29 @@ secrets-encrypt: ## Encrypt a plaintext Secret file (FILE=path [DEST=path])
 
 secrets-apply: ## Decrypt on-the-fly and apply encrypted secrets into Kubernetes
 	./scripts/secrets-tool.sh apply
+
+secrets-eso: ## Install External Secrets Operator (ESO) and configure Vault store
+	helm upgrade --install external-secrets external-secrets/external-secrets \
+		--namespace external-secrets --create-namespace \
+		--wait --timeout 180s \
+		-f helm/external-secrets-values.yaml
+	kubectl apply -k gitops/secrets/eso/
+	@echo "✓ External Secrets Operator and ClusterSecretStore configured"
+
+harden: ## Automatically harden an insecure manifest (usage: make harden FILE=... [OUTPUT=...] [IN_PLACE=true])
+	python3 scripts/harden-manifest.py $(if $(OUTPUT),-o $(OUTPUT),) $(if $(filter true,$(IN_PLACE)),-i,) $(FILE)
+
+generate-network-policy: ## Generate least-privilege NetworkPolicy for a pod (usage: make generate-network-policy TARGET=... [NS=...])
+	./scripts/generate-network-policy.sh $(TARGET) $(if $(NS),$(NS),default) $(if $(OUTPUT),-o $(OUTPUT),)
+
+vap: ## Apply native Kubernetes 1.30+ in-tree CEL ValidatingAdmissionPolicies
+	kubectl apply -k kustomize/base/vap
+
+cloud-eks: ## Initialize and plan AWS EKS CIS-hardened Terraform module
+	cd terraform/eks && terraform init -input=false && terraform validate
+
+cloud-gke: ## Initialize and plan GCP GKE CIS-hardened Terraform module
+	cd terraform/gke && terraform init -input=false && terraform validate
 
 bench: ## Step 6: Run kube-bench and report the CIS score
 	kubectl delete job kube-bench -n kube-system --ignore-not-found

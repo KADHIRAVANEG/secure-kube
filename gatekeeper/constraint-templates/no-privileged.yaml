@@ -17,13 +17,13 @@ spec:
         violation[{"msg": msg}] {
           c := input_containers[_]
           c.securityContext.privileged == true
-          msg := sprintf("container <%v> must not run as privileged", [c.name])
+          msg := sprintf("container <%v> must not run as privileged. Remediation: remove 'securityContext.privileged: true' or run 'make harden FILE=<manifest>'", [c.name])
         }
 
         violation[{"msg": msg}] {
           c := input_containers[_]
           c.securityContext.allowPrivilegeEscalation == true
-          msg := sprintf("container <%v> must not allow privilege escalation", [c.name])
+          msg := sprintf("container <%v> must not allow privilege escalation. Remediation: set 'securityContext.allowPrivilegeEscalation: false'", [c.name])
         }
 
         input_containers[c] {

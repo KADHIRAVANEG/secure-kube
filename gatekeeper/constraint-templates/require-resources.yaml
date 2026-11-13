@@ -18,25 +18,25 @@ spec:
         violation[{"msg": msg}] {
           c := input_containers[_]
           not c.resources.requests.cpu
-          msg := sprintf("container <%v> is missing resources.requests.cpu", [c.name])
+          msg := sprintf("container <%v> is missing resources.requests.cpu. Remediation: define 'resources.requests.cpu' (e.g., '50m') or run 'make harden FILE=<manifest>'", [c.name])
         }
 
         violation[{"msg": msg}] {
           c := input_containers[_]
           not c.resources.requests.memory
-          msg := sprintf("container <%v> is missing resources.requests.memory", [c.name])
+          msg := sprintf("container <%v> is missing resources.requests.memory. Remediation: define 'resources.requests.memory' (e.g., '64Mi')", [c.name])
         }
 
         violation[{"msg": msg}] {
           c := input_containers[_]
           not c.resources.limits.cpu
-          msg := sprintf("container <%v> is missing resources.limits.cpu", [c.name])
+          msg := sprintf("container <%v> is missing resources.limits.cpu. Remediation: define 'resources.limits.cpu' (e.g., '200m')", [c.name])
         }
 
         violation[{"msg": msg}] {
           c := input_containers[_]
           not c.resources.limits.memory
-          msg := sprintf("container <%v> is missing resources.limits.memory", [c.name])
+          msg := sprintf("container <%v> is missing resources.limits.memory. Remediation: define 'resources.limits.memory' (e.g., '128Mi')", [c.name])
         }
 
         input_containers[c] {

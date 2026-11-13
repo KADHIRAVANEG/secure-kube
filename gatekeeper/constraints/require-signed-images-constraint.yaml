@@ -28,6 +28,7 @@ spec:
       - argocd
       - monitoring
       - local-path-storage
+      - external-secrets
   parameters:
     allowedSigners:
       - "https://github.com/KADHIRAVANEG/secure-kube/.github/workflows/release.yaml@refs/heads/main"
