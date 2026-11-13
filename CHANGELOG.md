@@ -9,6 +9,10 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 ## [Unreleased] - v1.3.0
 
 ### Added
+- **GitOps Observability Integration**: Brought `kube-prometheus-stack` Helm release and custom observability resources under declarative GitOps management via `gitops/apps/monitoring-helm-app.yaml` and `gitops/apps/observability-app.yaml` (#18).
+- **Offline Policy Testing**: Added Gatekeeper offline policy testing via `gator test` CLI in [`scripts/test-offline.sh`](scripts/test-offline.sh) and `make test-offline` target (#19).
+- **Pre-Commit Linting**: Added `make lint` running ShellCheck static analysis on scripts, Terraform recursive format verification, and YAML manifest validation (#19).
+- **CI Linting & Offline Validation**: Integrated `make lint` and `make test-offline` into GitHub Actions CI workflow prior to cluster deployment (#19).
 - **Visual Showcase & Screenshots**: High-resolution UI captures of live running Kind cluster (`docs/screenshots/`):
   - Argo CD GitOps Dashboard (`argocd-dashboard.png`) managing all 8 core apps
   - Grafana Unified Security & Cluster Overview (`grafana-dashboard.png`)

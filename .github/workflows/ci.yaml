@@ -39,8 +39,16 @@ jobs:
           ignore-unfixed: true
           format: table
 
-      - name: Terraform fmt check
-        run: terraform -chdir=terraform/kind fmt -check -recursive
+      - name: Install shellcheck and gator
+        run: |
+          sudo apt-get update && sudo apt-get install -y shellcheck
+          curl -sSL https://github.com/open-policy-agent/gatekeeper/releases/download/v3.18.0/gator-v3.18.0-linux-amd64.tar.gz | sudo tar -xz -C /usr/local/bin gator
+
+      - name: Run linting (shellcheck, terraform, YAML)
+        run: make lint
+
+      - name: Run offline policy tests (gator)
+        run: make test-offline
 
       - name: Terraform validate
         run: |

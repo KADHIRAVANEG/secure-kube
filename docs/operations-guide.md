@@ -14,6 +14,8 @@ SecureKube orchestrates cluster deployment using Terraform and Make. All underly
 |---|---|---|
 | `make deploy` | End-to-end bootstrap (Cluster -> Policies -> Gatekeeper -> Falco -> Argo CD -> Test) | Fully configured 3-node cluster |
 | `make status` | Health check across nodes, Calico, Gatekeeper, Falco, Argo CD, and test workloads | Status summary table |
+| `make lint` | Runs static analysis (ShellCheck on scripts, Terraform fmt, YAML validation) | Zero lint errors |
+| `make test-offline` | Runs Gatekeeper policy validation offline via `gator` CLI (no cluster required) | All constraints validated |
 | `make test` | Runs positive & negative admission control tests via `scripts/test-policies.sh` | 8 rejected, 1 allowed |
 | `make bench` | Runs CIS Kubernetes Benchmark via `kube-bench` in `kube-system` | CIS compliance report |
 | `make destroy` | Tears down the Kind cluster and purges local state | Clean host state |

@@ -89,15 +89,21 @@ sync-gatekeeper: ## Manually trigger Argo CD sync for Gatekeeper constraints
 	kubectl -n argocd patch application securekube-gatekeeper-constraints \
 		--type merge -p '{"operation":{"initiatedBy":{"username":"makefile"},"sync":{"revision":"HEAD"}}}'
 
-sync-helm-apps: ## Manually trigger Argo CD sync for Gatekeeper, Falco, and Argo CD Helm apps
+sync-helm-apps: ## Manually trigger Argo CD sync for Gatekeeper, Falco, Argo CD, and Monitoring Helm apps
 	kubectl -n argocd patch application securekube-gatekeeper \
 		--type merge -p '{"operation":{"initiatedBy":{"username":"makefile"},"sync":{"revision":"HEAD"}}}' || true
 	kubectl -n argocd patch application securekube-falco \
 		--type merge -p '{"operation":{"initiatedBy":{"username":"makefile"},"sync":{"revision":"HEAD"}}}' || true
 	kubectl -n argocd patch application securekube-argocd \
 		--type merge -p '{"operation":{"initiatedBy":{"username":"makefile"},"sync":{"revision":"HEAD"}}}' || true
+	kubectl -n argocd patch application securekube-monitoring \
+		--type merge -p '{"operation":{"initiatedBy":{"username":"makefile"},"sync":{"revision":"HEAD"}}}' || true
 
-sync-all: sync-policies sync-rbac sync-pod-security sync-gatekeeper sync-helm-apps ## Trigger Argo CD sync for all layers
+sync-observability: ## Manually trigger Argo CD sync for observability dashboards and alerts
+	kubectl -n argocd patch application securekube-observability \
+		--type merge -p '{"operation":{"initiatedBy":{"username":"makefile"},"sync":{"revision":"HEAD"}}}' || true
+
+sync-all: sync-policies sync-rbac sync-pod-security sync-gatekeeper sync-helm-apps sync-observability ## Trigger Argo CD sync for all layers
 
 observability: ## Install Prometheus + Grafana + Alertmanager + Falco alert rules
 	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts --force-update
@@ -124,6 +130,18 @@ dashboard-grafana: ## Port-forward Grafana to localhost:3000
 dashboard-prometheus: ## Port-forward Prometheus to localhost:9090
 	@echo "Opening Prometheus at http://localhost:9090 (Ctrl+C to stop)"
 	kubectl port-forward -n monitoring svc/kube-prometheus-stack-prometheus 9090:9090
+
+lint: ## Run static analysis (shellcheck, terraform fmt, YAML validation)
+	@echo "→ Checking shell scripts with shellcheck..."
+	shellcheck scripts/*.sh
+	@echo "→ Checking Terraform formatting..."
+	terraform -chdir=terraform/kind fmt -check -recursive
+	@echo "→ Validating YAML manifests..."
+	python3 -c "import yaml, glob; [list(yaml.safe_load_all(open(f))) for f in glob.glob('**/*.yaml', recursive=True) + glob.glob('**/*.yml', recursive=True)]"
+	@echo "✓ All static linting checks passed!"
+
+test-offline: ## Run offline Gatekeeper policy validation via gator
+	./scripts/test-offline.sh
 
 test: ## Step 6: Test policies (negative + positive)
 	./scripts/test-policies.sh

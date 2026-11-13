@@ -29,6 +29,8 @@ spec:
       namespace: falco
     - server: https://kubernetes.default.svc
       namespace: argocd
+    - server: https://kubernetes.default.svc
+      namespace: monitoring
 
   # Cluster-scoped resources these apps are allowed to manage.
   clusterResourceWhitelist:
@@ -56,6 +58,8 @@ spec:
       kind: RoleBinding
     - group: "networking.k8s.io"
       kind: NetworkPolicy
+    - group: "monitoring.coreos.com"
+      kind: "*"
     - group: "policy"
       kind: PodDisruptionBudget
 
