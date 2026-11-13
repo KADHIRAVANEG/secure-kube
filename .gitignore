@@ -40,3 +40,9 @@ argocd-secret*
 securekube-v*.zip
 dist/
 cosign.key
+
+# SOPS / Age private keys & unencrypted secret working copies
+*.key
+keys.txt
+*.dec.yaml
+*.dec.yml

@@ -175,3 +175,68 @@ The event will immediately reflect on the **Falco Sidekick UI** at `http://local
   ```bash
   kubectl -n argocd port-forward svc/argocd-server 8080:80 --address 127.0.0.1
   ```
+
+---
+
+## 7. GitOps Secrets Management (SOPS + Age)
+
+Storing raw secrets in Git repositories is a critical vulnerability. SecureKube implements zero-trust GitOps secrets management using **Mozilla SOPS** and modern **Age asymmetric encryption**.
+
+### How It Works
+
+1. **Local Key Generation**: A private/public Age keypair is generated locally (`~/.config/sops/age/keys.txt`).
+2. **Public Key Configuration**: The public recipient is committed to [`.sops.yaml`](../.sops.yaml) targeting `.*\.enc\.ya?ml$`.
+3. **Encrypted in Git**: Kubernetes Secret manifests (e.g., [`gitops/secrets/database-credentials.enc.yaml`](../gitops/secrets/database-credentials.enc.yaml)) are committed fully encrypted. Only keys and metadata remain plaintext; sensitive payload values are AES-256-GCM encrypted.
+4. **On-the-Fly Application**: Manifests are decrypted in-memory during application without writing plaintext to disk.
+
+### Secrets Lifecycle Operations
+
+```bash
+# 1. Initialize Age keypair & configure .sops.yaml
+make secrets-init
+
+# 2. Encrypt an existing plaintext Secret manifest
+make secrets-encrypt FILE=my-secret.yaml DEST=gitops/secrets/my-secret.enc.yaml
+
+# 3. Decrypt and apply encrypted secrets directly to the live cluster
+make secrets-apply
+
+# 4. Sync Age private key to Argo CD namespace (for GitOps KSOPS plugin)
+./scripts/secrets-tool.sh sync-key
+```
+
+### Reference Pod Consuming Decrypted Secret
+
+See [`examples/secure-app-with-secret.yaml`](../examples/secure-app-with-secret.yaml) for a hardened, admitted workload consuming database credentials via environment variables:
+
+```bash
+kubectl apply -f examples/secure-app-with-secret.yaml
+kubectl logs -n default pod/secure-app-with-secret
+```
+
+---
+
+## 8. Automated Security Assault & Defense Simulator (`make attack`)
+
+SecureKube provides an integrated offensive attack simulation suite ([`scripts/simulate-attacks.sh`](../scripts/simulate-attacks.sh)) to empirically verify that every defense layer actively repels real-world cyber threats.
+
+### Running the Assault Suite
+
+```bash
+make attack
+```
+
+### Attack Vectors & Mitigating Defense Layers
+
+| # | Attack Vector | Technique / Payload | Mitigating Layer | Outcome |
+|---|---|---|---|---|
+| **1** | **Privilege Escalation** | Pod with `privileged: true`, `CAP_SYS_ADMIN` | Kubernetes PSA (`restricted`) | **BLOCKED AT ADMISSION** |
+| **2** | **Host Escape** | Pod mounting `/` via `hostPath` | Kubernetes PSA (`restricted`) | **BLOCKED AT ADMISSION** |
+| **3** | **Network Sniffing** | Pod with `hostNetwork: true` eavesdropping on node | Kubernetes PSA (`restricted`) | **BLOCKED AT ADMISSION** |
+| **4** | **Supply Chain Poisoning** | Image pulled from untrusted external rogue registry | OPA Gatekeeper (`[allowed-repos]`) | **BLOCKED AT ADMISSION** |
+| **5** | **Privileged Port Hijack** | Non-root container attempting to bind port `80` | OPA Gatekeeper (`[capabilities-and-ports]`) | **BLOCKED AT ADMISSION** |
+| **6** | **Denial of Service** | Unbounded memory pod without requests or limits | OPA Gatekeeper (`[require-resources]`) | **BLOCKED AT ADMISSION** |
+| **7** | **Lateral Pivoting** | Cross-namespace TCP probing to unauthorized internal DB | Calico CNI + Default-Deny NetworkPolicy | **DROPPED BY NETWORK POLICY** |
+| **8** | **Runtime Exploitation** | Spawning interactive terminal shells inside container | Falco modern eBPF driver | **DETECTED IN KERNEL TELEMETRY** |
+
+The assault suite outputs a definitive defense score (100% resilience) and is suitable for CI/CD gates and red/blue team validation.

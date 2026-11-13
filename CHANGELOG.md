@@ -9,6 +9,9 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 ## [Unreleased] - v1.3.0
 
 ### Added
+- **Automated Security Assault & Defense Simulator**: Added [`scripts/simulate-attacks.sh`](scripts/simulate-attacks.sh) and `make attack` command simulating 8 distinct cyber attack vectors (privilege escalation, host escapes, hostNetwork MITM, untrusted registry supply chain, privileged port hijacking, memory exhaustion DoS, Calico cross-namespace pivoting, Falco eBPF runtime exploitation) with 100% defense resilience scoring.
+- **GitOps Secrets Management (SOPS + Age)**: Added zero-trust encrypted secrets management pipeline using Mozilla SOPS and modern Age asymmetric cryptography. Includes [`.sops.yaml`](.sops.yaml) creation rules, [`scripts/secrets-tool.sh`](scripts/secrets-tool.sh) key management and sync utility, encrypted database credentials at [`gitops/secrets/database-credentials.enc.yaml`](gitops/secrets/database-credentials.enc.yaml), and compliant reference pod at [`examples/secure-app-with-secret.yaml`](examples/secure-app-with-secret.yaml).
+- **Secrets & Attack Make Targets**: Added `make attack`, `make secrets-init`, `make secrets-encrypt`, and `make secrets-apply` commands.
 - **GitOps Observability Integration**: Brought `kube-prometheus-stack` Helm release and custom observability resources under declarative GitOps management via `gitops/apps/monitoring-helm-app.yaml` and `gitops/apps/observability-app.yaml` (#18).
 - **Offline Policy Testing**: Added Gatekeeper offline policy testing via `gator test` CLI in [`scripts/test-offline.sh`](scripts/test-offline.sh) and `make test-offline` target (#19).
 - **Pre-Commit Linting**: Added `make lint` running ShellCheck static analysis on scripts, Terraform recursive format verification, and YAML manifest validation (#19).
