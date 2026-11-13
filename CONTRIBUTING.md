@@ -49,9 +49,9 @@ We are NOT currently looking for:
 
 ```bash
 terraform >= 1.5.0
-kubectl >= 1.28
-helm >= 3.12
-kind >= 0.22
+kubectl >= 1.30.0
+helm >= 3.14.0
+kind >= 0.24.0
 docker (with your user in the docker group)
 ```
 
@@ -146,9 +146,10 @@ Every PR that changes a policy, constraint, or security control must:
 
 For new Gatekeeper constraints specifically:
 - Add the `ConstraintTemplate` in `gatekeeper/constraint-templates/`
-- Add the `Constraint` in `gatekeeper/constraints/` with `argocd`, `gatekeeper-system`, `falco`, `kube-system`, `calico-system` in `excludedNamespaces`
+- Add the `Constraint` in `gatekeeper/constraints/` with `argocd`, `gatekeeper-system`, `falco`, `kube-system`, `calico-system`, `monitoring`, `local-path-storage` in `excludedNamespaces`
 - Add a negative test pod in `examples/insecure-apps.yaml`
 - Add the pod name to the `EXPECTED_REJECTED` list in `scripts/test-policies.sh`
+- Document the threat vector mitigated in `docs/architecture.md`
 
 ---
 

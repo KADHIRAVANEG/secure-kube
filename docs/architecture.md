@@ -53,6 +53,30 @@ The first version of this Makefile applied `kube-bench`'s job manifest without s
 
 Fix: run `kube-bench` in `kube-system` instead, which we deliberately left unlabeled (no PSA, and already excluded from every Gatekeeper constraint's `excludedNamespaces`) precisely because cluster-level system tooling legitimately needs broader access than application workloads. This is the same reasoning that already applies to Calico and Gatekeeper's own pods — `kube-bench` just needed the same treatment and we'd missed it.
 
+## Why `local-path-storage` is excluded in Gatekeeper constraints
+
+Kind clusters rely on Rancher's `local-path-provisioner` to dynamically provision local PersistentVolumes. When a PVC is created (e.g. for Prometheus, Grafana, or Alertmanager), the provisioner spins up a transient `helper-pod` in the `local-path-storage` namespace. This helper pod mounts the node's `/var/local-path-provisioner` directory via `hostPath` to initialize storage paths, and runs as a minimal utility without explicit resource requests.
+
+If `local-path-storage` is not explicitly added to `excludedNamespaces` on Gatekeeper constraints, `block-hostpath` and `require-resources` will reject the helper pod on admission. The PVC remains stuck in `Pending` indefinitely with event logs citing admission rejection. Adding `local-path-storage` ensures local volume provisioning functions smoothly while keeping all user and workload namespaces strictly enforced.
+
+## GitOps Architecture: Multi-Application Decoupling
+
+Argo CD manages each layer of SecureKube as a distinct `Application` object under an `AppProject` (`gitops/apps/project.yaml`):
+
+1. **Infrastructure Controllers**: `calico-system-app`, `gatekeeper-system-app`, `falco-system-app`.
+2. **Cluster Policies**: `gatekeeper-templates-app`, `gatekeeper-constraints-app`, `network-policies-app`, `pod-security-app`, `rbac-app`.
+3. **Workload Reference**: `secure-app`.
+
+To prevent resource ownership conflicts and duplicate drift calculations in Argo CD, each policy layer is maintained in its own self-contained directory with an independent `kustomization.yaml` (e.g., `kustomize/base/network-policies/`, `kustomize/base/pod-security/`, `kustomize/base/rbac/`). Pointing multiple Argo CD applications at the same directory is strictly avoided.
+
+## Observability & Security Telemetry Integration
+
+Security without observability creates an operational blind spot. SecureKube combines runtime kernel telemetry with admission audit metrics:
+
+- **Falco eBPF Probes**: Inspect system calls (execve, open, connect) on worker and control-plane nodes. Alerts are emitted in JSON to standard out and forwarded over HTTP to `falco-sidekick` and Redis.
+- **Falco Sidekick UI**: Visualizes runtime threat frequency, priority classifications (`Warning`, `Error`, `Critical`), and offending container metadata at `localhost:2802`.
+- **Prometheus & Grafana (`kube-prometheus-stack`)**: Scrapes Gatekeeper metrics (`gatekeeper_violations`, `gatekeeper_constraints`), cAdvisor, and node-exporter metrics. Pre-provisioned dashboards in `observability/dashboards/` offer immediate situational awareness of cluster compliance and resource health.
+
 ## Audit logging scope
 
 `terraform/kind/audit-policy.yaml` logs full request/response bodies only for `secrets`, `configmaps`, and RBAC objects — the resources where a full body matters for a security investigation — and only request metadata for everything else, to keep log volume manageable while still satisfying CIS 3.2.x.

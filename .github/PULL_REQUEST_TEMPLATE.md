@@ -25,7 +25,7 @@ Closes #<!-- issue number -->
 ## Checklist
 
 - [ ] Commit messages follow the Conventional Commits format
-- [ ] New constraints include `argocd`, `gatekeeper-system`, `falco`, `kube-system`, `calico-system` in `excludedNamespaces`
+- [ ] New constraints include `argocd`, `gatekeeper-system`, `falco`, `kube-system`, `calico-system`, `monitoring`, `local-path-storage` in `excludedNamespaces`
 - [ ] Documentation updated if behaviour changed
 - [ ] `docs/architecture.md` updated if a trade-off was made
 

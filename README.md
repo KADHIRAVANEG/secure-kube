@@ -224,6 +224,7 @@ securekube/
 │   └── test-policies.sh             negative + positive policy tests
 ├── docs/
 │   ├── architecture.md              the real reasoning behind every non-obvious decision
+│   ├── operations-guide.md          day-2 runbook, dashboard access, workload guide
 │   └── screenshots/                 live UI & terminal verification captures
 └── .github/workflows/ci.yaml        spins up kind, deploys, validates, tears down
 ```
@@ -246,9 +247,19 @@ securekube/
 | `helm install falco` fails with `driver.kind=ebpf ... no longer supported` | Falco chart renamed the value | Already fixed — `helm/falco-values.yaml` uses `modern_ebpf` |
 | `kubectl apply` fails with `invalid object to validate` right after installing a new CRD | Stale local kubectl schema cache | `rm -rf ~/.kube/cache` and retry |
 | `make test` — secure-app gets rejected on `seccompProfile` | Pod Security Standards' `restricted` profile requires `securityContext.seccompProfile.type: RuntimeDefault` | Already set in `examples/secure-app.yaml` |
+| PVCs stuck in `Pending` state | Kind's local volume provisioner helper pod blocked by Gatekeeper | Already fixed — `local-path-storage` is excluded in `gatekeeper/constraints/*.yaml` |
 | `make bench` hangs, `kubectl wait` times out on `job/kube-bench` | `kube-bench` needs `hostPID`/`hostPath`, which our own restricted PSA on `default` blocks | Already fixed — `make bench` now runs it in `kube-system`, which is intentionally unlabeled for system tooling |
 | Port 2802 already in use (`make dashboard`) | Another process is bound to it | `kubectl port-forward -n falco svc/falco-falcosidekick-ui <free-port>:2802` manually |
 | `make destroy` leaves resources behind | Terraform state drift after manual `kubectl`/`kind` changes | `kind delete cluster --name securekube` as a manual fallback |
+
+## Documentation Index
+
+- **[Architecture Deep-Dive](docs/architecture.md)** — Rationale behind security controls, trade-offs (`anonymous-auth`, fail-open webhook), and lessons learned.
+- **[Operations & Day-2 Guide](docs/operations-guide.md)** — Practical runbook for cluster access, dashboard credentials, compliant workload authoring, and troubleshooting.
+- **[Network Policies Guide](network-policies/README.md)** — Zero-trust template index and multi-tier application reference.
+- **[Contributing Guide](CONTRIBUTING.md)** — Contribution workflow, commit conventions, Gatekeeper constraint checklist, and test requirements.
+- **[Security Policy](SECURITY.md)** — Vulnerability reporting protocol and documented trade-offs.
+- **[Changelog](CHANGELOG.md)** — Keep a Changelog tracking releases, features, and fixes.
 
 ## References
 
@@ -261,8 +272,8 @@ securekube/
 
 - [x] GitOps layer — Argo CD managing all policy layers (NetworkPolicy, RBAC, PSA, Gatekeeper constraints)
 - [x] GitOps for Helm releases (Gatekeeper, Falco, Argo CD itself as Argo CD Applications)
+- [x] Image signing/verification via Cosign + Gatekeeper
+- [x] Per-workload egress NetworkPolicy allow-lists
 - [ ] EKS Terraform module (IAM Roles for Service Accounts, VPC CNI + NetworkPolicy)
 - [ ] GKE Terraform module (Workload Identity, GKE Sandbox / gVisor)
-- [ ] Image signing/verification via Cosign + Gatekeeper
 - [ ] Secrets management via External Secrets Operator
-- [x] Per-workload egress NetworkPolicy allow-lists

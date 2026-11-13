@@ -45,3 +45,4 @@ These are intentional, documented decisions — not vulnerabilities:
 | `anonymous-auth` enabled | kubeadm join bootstrap token requires it | `docs/architecture.md` |
 | CIS benchmark partially fails | kind cannot satisfy node-level controls | `README.md` |
 | Permissive allowed-repos list | Bundled examples need public registries | `gatekeeper/constraints/allowed-repos-constraint.yaml` |
+| `local-path-storage` excluded from constraints | Kind dynamic volume provisioner helper pod requires hostPath | `docs/architecture.md` |
