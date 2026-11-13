@@ -17,14 +17,14 @@ docker run --rm -it \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v $(pwd):/workspace \
   -w /workspace \
-  ghcr.io/joker-53/secure-kube:latest \
+  ghcr.io/kadhiravaneg/secure-kube:latest \
   make deploy
 ```
 
 Or from Docker Hub:
 
 ```bash
-docker pull joker-53/secure-kube:latest
+docker pull joker53/secure-kube:latest
 ```
 
 The image bundles `terraform`, `kubectl`, `helm`, `kind`, and the `argocd` CLI at pinned versions. The Docker socket mount is required because `kind` creates cluster nodes as containers on your host Docker daemon.

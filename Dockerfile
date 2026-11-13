@@ -11,7 +11,7 @@
 #     -v /var/run/docker.sock:/var/run/docker.sock \
 #     -v $(pwd):/workspace \
 #     -w /workspace \
-#     ghcr.io/joker-53/secure-kube:latest \
+#     ghcr.io/kadhiravaneg/secure-kube:latest \
 #     make deploy
 
 # ── Stage 1: download all tool binaries ──────────────────────────────
