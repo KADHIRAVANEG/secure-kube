@@ -3,7 +3,7 @@ export
 
 .PHONY: deploy deploy-light destroy cluster policies gatekeeper falco argocd observability verify test bench \
         status logs clean-logs dashboard dashboard-argocd dashboard-grafana dashboard-prometheus sync-policies sync-rbac \
-        sync-gatekeeper sync-pod-security sync-all clean help
+        sync-gatekeeper sync-pod-security sync-helm-apps sync-all clean help
 
 CLUSTER_NAME  ?= securekube
 TF_VAR_cluster_name         = $(strip $(CLUSTER_NAME))
@@ -11,7 +11,7 @@ TF_VAR_enable_network_policy_cni = $(strip $(ENABLE_CALICO))
 export TF_VAR_cluster_name TF_VAR_enable_network_policy_cni
 
 help: ## Show this help
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-18s\033[0m %s\n", $$1, $$2}'
+	@grep -h -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-22s\033[0m %s\n", $$1, $$2}'
 
 deploy: cluster policies gatekeeper falco argocd observability test ## Full one-command deploy (kind, local)
 	@echo ""
@@ -48,7 +48,7 @@ gatekeeper: ## Step 4: Install OPA Gatekeeper + all constraint templates + const
 	@echo "→ Waiting for CRDs to register..."
 	sleep 8
 	kubectl apply -f gatekeeper/constraints/
-	@echo "→ Gatekeeper installed — 6 constraints enforced: no-root, no-privileged, readonly-rootfs, no-hostpath, no-host-namespaces, require-resources, allowed-repos, capabilities-and-ports"
+	@echo "→ Gatekeeper installed — 9 constraints enforced: no-root, no-privileged, readonly-rootfs, no-hostpath, no-host-namespaces, require-resources, allowed-repos, capabilities-and-ports, require-signed-images"
 
 falco: ## Step 5: Install Falco for runtime threat detection + audit logging
 ifeq ($(strip $(ENABLE_FALCO)),true)
@@ -89,7 +89,15 @@ sync-gatekeeper: ## Manually trigger Argo CD sync for Gatekeeper constraints
 	kubectl -n argocd patch application securekube-gatekeeper-constraints \
 		--type merge -p '{"operation":{"initiatedBy":{"username":"makefile"},"sync":{"revision":"HEAD"}}}'
 
-sync-all: sync-policies sync-rbac sync-pod-security sync-gatekeeper ## Trigger Argo CD sync for all layers
+sync-helm-apps: ## Manually trigger Argo CD sync for Gatekeeper, Falco, and Argo CD Helm apps
+	kubectl -n argocd patch application securekube-gatekeeper \
+		--type merge -p '{"operation":{"initiatedBy":{"username":"makefile"},"sync":{"revision":"HEAD"}}}' || true
+	kubectl -n argocd patch application securekube-falco \
+		--type merge -p '{"operation":{"initiatedBy":{"username":"makefile"},"sync":{"revision":"HEAD"}}}' || true
+	kubectl -n argocd patch application securekube-argocd \
+		--type merge -p '{"operation":{"initiatedBy":{"username":"makefile"},"sync":{"revision":"HEAD"}}}' || true
+
+sync-all: sync-policies sync-rbac sync-pod-security sync-gatekeeper sync-helm-apps ## Trigger Argo CD sync for all layers
 
 observability: ## Install Prometheus + Grafana + Alertmanager + Falco alert rules
 	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts --force-update
@@ -116,6 +124,8 @@ dashboard-grafana: ## Port-forward Grafana to localhost:3000
 dashboard-prometheus: ## Port-forward Prometheus to localhost:9090
 	@echo "Opening Prometheus at http://localhost:9090 (Ctrl+C to stop)"
 	kubectl port-forward -n monitoring svc/kube-prometheus-stack-prometheus 9090:9090
+
+test: ## Step 6: Test policies (negative + positive)
 	./scripts/test-policies.sh
 
 verify: test ## Alias for 'test' (back-compat)

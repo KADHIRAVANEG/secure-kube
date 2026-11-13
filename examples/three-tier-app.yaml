@@ -9,7 +9,7 @@
 #   - database: accepts calls from backend only, no egress except DNS
 #
 # Apply all at once:
-#   kubectl apply -f network-policies/examples/three-tier-app.yaml -n your-namespace
+#   kubectl apply -f examples/three-tier-app.yaml -n your-namespace
 
 # ─── Frontend ────────────────────────────────────────────────────────
 # Accepts HTTP from anywhere (port 8080), calls the backend (port 3000)

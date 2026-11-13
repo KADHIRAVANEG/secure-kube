@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: securekube-falco
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: securekube-infra
+  sources:
+    - repoURL: https://falcosecurity.github.io/charts
+      targetRevision: 9.1.0
+      chart: falco
+      helm:
+        valueFiles:
+          - $values/helm/falco-values.yaml
+    - repoURL: https://github.com/PLACEHOLDER/securekube
+      targetRevision: HEAD
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: falco
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true

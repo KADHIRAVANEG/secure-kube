@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: securekube-infra
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  description: "SecureKube Infrastructure — Helm releases for core components"
+
+  sourceRepos:
+    - https://github.com/PLACEHOLDER/securekube
+    - https://argoproj.github.io/argo-helm
+    - https://open-policy-agent.github.io/gatekeeper/charts
+    - https://falcosecurity.github.io/charts
+
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: gatekeeper-system
+    - server: https://kubernetes.default.svc
+      namespace: falco
+    - server: https://kubernetes.default.svc
+      namespace: argocd
+
+  # Infrastructure components need broad permissions to install CRDs, webhooks, and daemonsets
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+
+  namespaceResourceWhitelist:
+    - group: "*"
+      kind: "*"

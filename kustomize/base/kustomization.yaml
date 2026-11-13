@@ -2,9 +2,9 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - pod-security/psa-labels.yaml   # namespaces first (others depend on them existing)
-  - network-policies/default-deny.yaml
-  - rbac/least-privilege.yaml
+  - pod-security   # namespaces first (others depend on them existing)
+  - network-policies
+  - rbac
 
 commonLabels:
   app.kubernetes.io/part-of: securekube

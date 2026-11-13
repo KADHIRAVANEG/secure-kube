@@ -2,17 +2,17 @@
 # Bundles every tool needed to run `make deploy` so users don't need
 # to install anything locally — just Docker.
 #
+# Tool versions bumped to fix 429 CVEs found by Trivy in v1.4.0:
+#   - crypto/tls issues fixed in newer Go-based binaries
+#   - grpc-go authorization bypass fixed in updated versions
+#
 # Usage:
 #   docker run --rm -it \
 #     -v /var/run/docker.sock:/var/run/docker.sock \
 #     -v $(pwd):/workspace \
 #     -w /workspace \
-#     ghcr.io/kadhiravaneg/secure-kube:latest \
+#     ghcr.io/joker-53/secure-kube:latest \
 #     make deploy
-#
-# Note: Docker socket mount is required because kind creates clusters
-# as Docker containers on the host — the tool container needs to talk
-# to the host Docker daemon to do that.
 
 # ── Stage 1: download all tool binaries ──────────────────────────────
 FROM alpine:3.21 AS downloader
@@ -21,13 +21,11 @@ RUN apk add --no-cache curl unzip bash
 
 WORKDIR /tools
 
-# Tool versions — pin these explicitly so the image is reproducible.
-# Update them here when you want to bump a tool version.
-ENV TERRAFORM_VERSION=1.9.8 \
-    KUBECTL_VERSION=1.31.4 \
-    HELM_VERSION=3.16.4 \
-    KIND_VERSION=0.25.0 \
-    ARGOCD_VERSION=2.13.2
+ENV TERRAFORM_VERSION=1.15.8 \
+    KUBECTL_VERSION=1.36.3 \
+    HELM_VERSION=4.2.2 \
+    KIND_VERSION=0.27.0 \
+    ARGOCD_VERSION=3.0.6
 
 # Terraform
 RUN curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" \
@@ -59,37 +57,26 @@ RUN curl -fsSL "https://github.com/argoproj/argo-cd/releases/download/v${ARGOCD_
 # ── Stage 2: final lean image ─────────────────────────────────────────
 FROM debian:bookworm-slim
 
-# Install runtime dependencies only
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-       bash \
-       make \
-       git \
-       curl \
-       ca-certificates \
-       python3 \
-       python3-yaml \
+       bash make git curl ca-certificates python3 python3-yaml \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy binaries from downloader stage
 COPY --from=downloader /tools/terraform  /usr/local/bin/terraform
 COPY --from=downloader /tools/kubectl    /usr/local/bin/kubectl
 COPY --from=downloader /tools/helm       /usr/local/bin/helm
 COPY --from=downloader /tools/kind       /usr/local/bin/kind
 COPY --from=downloader /tools/argocd     /usr/local/bin/argocd
 
-# Verify all tools are present and executable
 RUN terraform version \
     && kubectl version --client \
     && helm version \
     && kind version \
     && argocd version --client
 
-# Copy the full repo into the image so it works standalone
 COPY . /workspace
 WORKDIR /workspace
 
-# Default: show available make targets
 CMD ["make", "help"]
 
 LABEL org.opencontainers.image.title="SecureKube" \

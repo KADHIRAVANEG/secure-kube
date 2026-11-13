@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: securekube-gatekeeper
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: securekube-infra
+  sources:
+    - repoURL: https://open-policy-agent.github.io/gatekeeper/charts
+      targetRevision: 3.23.1
+      chart: gatekeeper
+      helm:
+        valueFiles:
+          - $values/helm/gatekeeper-values.yaml
+    - repoURL: https://github.com/PLACEHOLDER/securekube
+      targetRevision: HEAD
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gatekeeper-system
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true

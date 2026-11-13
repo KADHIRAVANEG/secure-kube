@@ -11,7 +11,7 @@
 #   cosign verify \
 #     --certificate-identity-regexp="https://github.com/KADHIRAVANEG/secure-kube/.*" \
 #     --certificate-oidc-issuer="https://token.actions.githubusercontent.com" \
-#     ghcr.io/kadhiravaneg/secure-kube:v1.4.0
+#     ghcr.io/joker-53/secure-kube:v1.4.0
 set -euo pipefail
 
 OWNER_LC=$(echo "${GITHUB_REPOSITORY_OWNER}" | tr '[:upper:]' '[:lower:]')

@@ -23,7 +23,7 @@ We will respond within 72 hours and aim to release a fix within 14 days for conf
 
 This project is a **local development / reference implementation**. Please report:
 
-- Vulnerabilities in the container image (`ghcr.io/kadhiravaneg/secure-kube`)
+- Vulnerabilities in the container image (`ghcr.io/joker-53/secure-kube`)
 - Gatekeeper constraints that can be bypassed in ways not already documented
 - CI/CD workflow vulnerabilities (secret exposure, injection attacks)
 - Incorrect security documentation that could mislead users into unsafe configurations
@@ -45,3 +45,4 @@ These are intentional, documented decisions — not vulnerabilities:
 | `anonymous-auth` enabled | kubeadm join bootstrap token requires it | `docs/architecture.md` |
 | CIS benchmark partially fails | kind cannot satisfy node-level controls | `README.md` |
 | Permissive allowed-repos list | Bundled examples need public registries | `gatekeeper/constraints/allowed-repos-constraint.yaml` |
+| `local-path-storage` excluded from constraints | Kind dynamic volume provisioner helper pod requires hostPath | `docs/architecture.md` |

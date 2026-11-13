@@ -27,6 +27,7 @@ spec:
       - calico-system
       - argocd
       - monitoring
+      - local-path-storage
   parameters:
     allowedSigners:
       - "https://github.com/KADHIRAVANEG/secure-kube/.github/workflows/release.yaml@refs/heads/main"
