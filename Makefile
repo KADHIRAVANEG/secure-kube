@@ -36,8 +36,12 @@ cluster: ## Step 1: Provision the kind cluster via Terraform
 
 policies: ## Step 2-3: Apply NetworkPolicy, RBAC, Pod Security Standards, and CEL Admission
 	kubectl apply -k kustomize/base
-	kubectl apply -k kustomize/base/vap
-	@echo "→ Default-deny NetworkPolicy, least-privilege RBAC, PSS labels, and in-tree CEL policies applied"
+	@if kubectl api-resources | grep -q "validatingadmissionpolicies"; then \
+		kubectl apply -k kustomize/base/vap; \
+	else \
+		echo "→ Skipping CEL ValidatingAdmissionPolicies (requires Kubernetes 1.30+)"; \
+	fi
+	@echo "→ Default-deny NetworkPolicy, least-privilege RBAC, PSS labels, and policies applied"
 
 gatekeeper: ## Step 4: Install OPA Gatekeeper + all constraint templates + constraints
 	helm repo add gatekeeper https://open-policy-agent.github.io/gatekeeper/charts --force-update
