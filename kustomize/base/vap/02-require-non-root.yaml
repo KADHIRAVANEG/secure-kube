@@ -1,0 +1,18 @@
+# NIST SP 800-190 4.4.3 / K8s Pod Security Standards (Restricted)
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: securekube-cel-require-non-root
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  validations:
+    - expression: |
+        (!has(object.spec.securityContext) || !has(object.spec.securityContext.runAsUser) || object.spec.securityContext.runAsUser > 0) &&
+        (!has(object.spec.containers) || object.spec.containers.all(c, has(c.securityContext) && has(c.securityContext.runAsNonRoot) && c.securityContext.runAsNonRoot == true))
+      message: "[CEL:require-non-root] Containers must run as non-root (runAsNonRoot: true, runAsUser > 0). Remediation: run 'make harden FILE=<manifest>'."

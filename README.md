@@ -177,8 +177,14 @@ make lint                 # static analysis: shellcheck, terraform fmt, YAML val
 make test-offline         # offline Gatekeeper policy tests via gator CLI
 make test                 # live policy tests (negative tests rejected + positive test allowed)
 make attack               # simulate 8 real-world cyber attacks and verify defense resilience
+make harden FILE=...      # auto-harden non-compliant manifests with required securityContexts & resources
+make generate-network-policy # auto-discover pod ports and generate minimal egress/ingress NetworkPolicy
+make vap                  # deploy Kubernetes native in-tree CEL ValidatingAdmissionPolicies
 make secrets-init         # generate Age encryption keypair and configure .sops.yaml
 make secrets-apply        # decrypt on-the-fly and apply encrypted secrets into Kubernetes
+make secrets-eso          # deploy External Secrets Operator & sync secrets from remote vaults
+make cloud-eks            # provision hardened AWS EKS cluster with CIS logging & IRSA via Terraform
+make cloud-gke            # provision hardened GCP GKE cluster with Cilium eBPF & Workload Identity via Terraform
 make bench                # CIS Benchmark score via kube-bench
 make dashboard            # port-forward Falco Sidekick UI to localhost:2802
 make dashboard-argocd     # port-forward Argo CD UI to localhost:8080 (prints admin password)
@@ -211,12 +217,15 @@ securekube/
 │   ├── outputs.tf
 │   ├── kind-config.yaml             static kind cluster config: audit logging, hardened API server flags
 │   └── audit-policy.yaml            CIS 3.2.x audit policy
+├── terraform/eks/                   hardened AWS EKS cluster module (KMS, CIS logging, IMDSv2, IRSA)
+├── terraform/gke/                   hardened GCP GKE cluster module (Datapath V2 eBPF, Workload Identity)
 ├── kustomize/base/
 │   ├── network-policies/            default-deny + DNS-allow NetworkPolicy & egress-templates
 │   │   ├── egress-templates/        per-workload egress templates (database, external API)
 │   │   └── kustomization.yaml
 │   ├── rbac/                        least-privilege Role/RoleBinding, no-wildcard rules
-│   └── pod-security/                PSA "restricted" labels per namespace
+│   ├── pod-security/                PSA "restricted" labels per namespace
+│   └── vap/                         Kubernetes 1.30+ native in-tree CEL ValidatingAdmissionPolicies
 ├── gatekeeper/
 │   ├── constraint-templates/        Rego: no-root, no-privileged, readonly-rootfs,
 │   │                                 no-hostpath, no-host-namespaces, require-resources,
@@ -224,11 +233,14 @@ securekube/
 │   └── constraints/                 activation of each template cluster-wide
 ├── .sops.yaml                       SOPS encryption configuration & Age recipient rules
 ├── gitops/
-│   ├── apps/                        Argo CD AppProjects and 11 declarative application manifests
-│   └── secrets/                     SOPS+Age encrypted Kubernetes Secrets (safe for Git)
+│   ├── apps/                        Argo CD AppProjects and 13 declarative application manifests
+│   └── secrets/
+│       ├── eso/                     External Secrets Operator (ClusterSecretStore, ExternalSecret)
+│       └── *.enc.yaml               SOPS+Age encrypted Kubernetes Secrets (safe for Git)
 ├── helm/
 │   ├── gatekeeper-values.yaml       fail-open webhook (see docs/architecture.md), 3 replicas
 │   ├── falco-values.yaml            modern_ebpf driver, JSON output, sidekick UI
+│   ├── external-secrets-values.yaml hardened non-root External Secrets Operator chart values
 │   └── kube-prometheus-stack-values.yaml tuned monitoring stack values (local Kind storage)
 ├── observability/
 │   ├── dashboards/                  Grafana JSON dashboards (unified security & cluster overview)
@@ -238,9 +250,12 @@ securekube/
 ├── examples/
 │   ├── secure-app.yaml              passes every policy layer -- proves the "happy path" works
 │   ├── secure-app-with-secret.yaml  hardened reference workload mounting decrypted SOPS secret
+│   ├── secure-app-with-vault-secret.yaml workload mounting secret synchronized via External Secrets Operator
 │   ├── insecure-apps.yaml           8 pods, each violating exactly one constraint
 │   └── three-tier-app.yaml          reference multi-tier workload with isolated network policies
 ├── scripts/
+│   ├── harden-manifest.py           automated CLI tool injecting required security contexts & resources
+│   ├── generate-network-policy.sh   automated pod connection discovery & least-privilege policy generator
 │   ├── test-policies.sh             live cluster negative + positive policy tests
 │   ├── test-offline.sh              offline Gatekeeper policy validation via gator CLI
 │   ├── simulate-attacks.sh          automated 8-vector offensive assault and defense verification
@@ -301,6 +316,9 @@ securekube/
 - [x] Per-workload egress NetworkPolicy allow-lists
 - [x] Secrets management via SOPS + Age encryption (GitOps zero-trust secrets)
 - [x] Automated Offensive Security Assault & Defense Verification (`make attack` 8 vectors)
-- [ ] EKS Terraform module (IAM Roles for Service Accounts, VPC CNI + NetworkPolicy)
-- [ ] GKE Terraform module (Workload Identity, GKE Sandbox / gVisor)
-- [ ] Secrets management via External Secrets Operator
+- [x] Automated Workload Manifest Hardener (`make harden FILE=...`)
+- [x] NetworkPolicy Auto-Discovery & Generation (`make generate-network-policy POD=...`)
+- [x] Kubernetes 1.30+ In-Tree CEL ValidatingAdmissionPolicies (`make vap`)
+- [x] Secrets management via External Secrets Operator (Vault, AWS Secrets Manager, GCP Secret Manager)
+- [x] Hardened AWS EKS Terraform module (KMS envelope encryption, CIS logging, IMDSv2, IRSA)
+- [x] Hardened GCP GKE Terraform module (Datapath V2 eBPF, Shielded Nodes, Workload Identity)

@@ -6,6 +6,21 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.6.0] - 2026-11-13
+
+### Added
+- **Automated Workload Hardener (`scripts/harden-manifest.py`, `make harden`)**: Automated CLI tool parsing raw, non-compliant Kubernetes manifests and injecting all required security contexts (`runAsNonRoot`, `readOnlyRootFilesystem`, `capabilities.drop: [ALL]`, `seccompProfile: RuntimeDefault`), resource requests/limits, and unprivileged ports with zero manual editing.
+- **Enriched Admission Remediation Guidance**: Updated all 9 Gatekeeper `ConstraintTemplates` to output actionable, copy-pasteable remediation guidance directly in developer terminals when a policy violation occurs.
+- **Calico Dropped Packet Observability & NetworkPolicy Auto-Discovery (`scripts/generate-network-policy.sh`, `make generate-network-policy`)**: Enabled Calico Felix Prometheus metrics on port 9091. Added automated NetworkPolicy generator inspecting live running pods and producing minimal required ingress/egress allow-lists with mandatory DNS port 53.
+- **In-Tree Kubernetes 1.30+ CEL ValidatingAdmissionPolicies (`kustomize/base/vap/`, `make vap`)**: Implemented 8 native Common Expression Language (CEL) `ValidatingAdmissionPolicy` resources and bindings evaluated directly in-process inside `kube-apiserver` with sub-millisecond admission latency, zero network hops, and zero webhook deadlock risks. Added Argo CD app `gitops/apps/validating-admission-policies-app.yaml`.
+- **External Secrets Operator (ESO) Local-to-Cloud Secrets Synchronization (`gitops/secrets/eso/`, `make secrets-eso`)**: Integrated External Secrets Operator with hardened non-root container deployment (`helm/external-secrets-values.yaml`), `ClusterSecretStore` supporting HashiCorp Vault, AWS Secrets Manager, and GCP Secret Manager (with local fake provider testing), automated `database-credentials-vault` secret syncing, reference application `examples/secure-app-with-vault-secret.yaml`, and Argo CD app `gitops/apps/external-secrets-app.yaml`.
+- **Multi-Cloud Hardened Terraform Modules (AWS EKS & GCP GKE)**:
+  - AWS EKS (`terraform/eks/`, `make cloud-eks`): Production-hardened EKS cluster with KMS envelope encryption, CloudWatch CIS control plane logging, IMDSv2-enforced node groups, IRSA (IAM Roles for Service Accounts), and automated SecureKube baseline bootstrapping.
+  - GCP GKE (`terraform/gke/`, `make cloud-gke`): Production-hardened GKE cluster with Datapath V2 (Cilium eBPF), Shielded GKE Nodes, Workload Identity, Private Cluster architecture, and automated SecureKube baseline bootstrapping.
+- **Real Terminal Documentation Screenshot**: Replaced placeholder terminal status capture in `docs/screenshots/terminal-cluster-status.png` with authentic live terminal capture provided by developer.
+
+---
+
 ## [1.5.0] - 2026-11-13
 
 ### Added

@@ -1,0 +1,114 @@
+# ValidatingAdmissionPolicyBindings linking SecureKube CEL policies cluster-wide
+# System namespaces (kube-system, gatekeeper-system, falco, argocd, monitoring, local-path-storage)
+# are excluded so critical infrastructure operators function without interference.
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: securekube-binding-no-privileged
+spec:
+  policyName: securekube-cel-no-privileged
+  validationActions: [Deny]
+  matchResources:
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values: ["kube-system", "gatekeeper-system", "falco", "argocd", "monitoring", "local-path-storage", "external-secrets"]
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: securekube-binding-require-non-root
+spec:
+  policyName: securekube-cel-require-non-root
+  validationActions: [Deny]
+  matchResources:
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values: ["kube-system", "gatekeeper-system", "falco", "argocd", "monitoring", "local-path-storage", "external-secrets"]
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: securekube-binding-readonly-rootfs
+spec:
+  policyName: securekube-cel-readonly-rootfs
+  validationActions: [Deny]
+  matchResources:
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values: ["kube-system", "gatekeeper-system", "falco", "argocd", "monitoring", "local-path-storage", "external-secrets"]
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: securekube-binding-no-hostpath
+spec:
+  policyName: securekube-cel-no-hostpath
+  validationActions: [Deny]
+  matchResources:
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values: ["kube-system", "gatekeeper-system", "falco", "argocd", "monitoring", "local-path-storage", "external-secrets"]
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: securekube-binding-no-host-namespaces
+spec:
+  policyName: securekube-cel-no-host-namespaces
+  validationActions: [Deny]
+  matchResources:
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values: ["kube-system", "gatekeeper-system", "falco", "argocd", "monitoring", "local-path-storage", "external-secrets"]
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: securekube-binding-require-resources
+spec:
+  policyName: securekube-cel-require-resources
+  validationActions: [Deny]
+  matchResources:
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values: ["kube-system", "gatekeeper-system", "falco", "argocd", "monitoring", "local-path-storage", "external-secrets"]
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: securekube-binding-capabilities-and-ports
+spec:
+  policyName: securekube-cel-capabilities-and-ports
+  validationActions: [Deny]
+  matchResources:
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values: ["kube-system", "gatekeeper-system", "falco", "argocd", "monitoring", "local-path-storage", "external-secrets"]
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: securekube-binding-allowed-registries
+spec:
+  policyName: securekube-cel-allowed-registries
+  validationActions: [Deny]
+  matchResources:
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values: ["kube-system", "gatekeeper-system", "falco", "argocd", "monitoring", "local-path-storage", "external-secrets"]

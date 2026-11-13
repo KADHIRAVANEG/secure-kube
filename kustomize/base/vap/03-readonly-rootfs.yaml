@@ -1,0 +1,17 @@
+# Pod Security Standards (Restricted) — ReadOnlyRootFilesystem
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: securekube-cel-readonly-rootfs
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  validations:
+    - expression: |
+        !has(object.spec.containers) || object.spec.containers.all(c, has(c.securityContext) && has(c.securityContext.readOnlyRootFilesystem) && c.securityContext.readOnlyRootFilesystem == true)
+      message: "[CEL:readonly-rootfs] Containers must enforce readOnlyRootFilesystem: true. Remediation: mount an emptyDir at /tmp if writes are required, or run 'make harden FILE=<manifest>'."

@@ -17,7 +17,7 @@ spec:
         violation[{"msg": msg}] {
           c := input_containers[_]
           not c.securityContext.runAsNonRoot == true
-          msg := sprintf("container <%v> must set securityContext.runAsNonRoot = true", [c.name])
+          msg := sprintf("container <%v> must set securityContext.runAsNonRoot = true. Remediation: add 'securityContext.runAsNonRoot: true' to the container spec or run 'make harden FILE=<manifest>'", [c.name])
         }
 
         input_containers[c] {

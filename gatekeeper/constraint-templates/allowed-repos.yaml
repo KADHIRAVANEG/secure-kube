@@ -26,7 +26,7 @@ spec:
         violation[{"msg": msg}] {
           c := input_containers[_]
           not allowed(c.image)
-          msg := sprintf("container <%v> uses image <%v> from a registry that is not in the allow-list", [c.name, c.image])
+          msg := sprintf("container <%v> uses image <%v> from a registry that is not in the allow-list. Remediation: pull from an approved registry prefix (docker.io/library/, ghcr.io/, gcr.io/, registry.k8s.io/) or run 'make harden FILE=<manifest>'", [c.name, c.image])
         }
 
         allowed(image) {

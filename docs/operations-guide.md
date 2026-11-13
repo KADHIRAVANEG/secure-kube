@@ -17,6 +17,12 @@ SecureKube orchestrates cluster deployment using Terraform and Make. All underly
 | `make lint` | Runs static analysis (ShellCheck on scripts, Terraform fmt, YAML validation) | Zero lint errors |
 | `make test-offline` | Runs Gatekeeper policy validation offline via `gator` CLI (no cluster required) | All constraints validated |
 | `make test` | Runs positive & negative admission control tests via `scripts/test-policies.sh` | 8 rejected, 1 allowed |
+| `make attack` | Runs 8-vector offensive security assault simulation | 100% defense score |
+| `make harden FILE=...` | Automatically fixes insecure manifests to pass all security policies | 100% compliant manifest |
+| `make generate-network-policy`| Auto-discovers pod connections and generates minimal NetworkPolicy | Least-privilege policy |
+| `make vap` | Deploys native Kubernetes in-tree CEL ValidatingAdmissionPolicies | Sub-ms admission enforcement |
+| `make secrets-eso` | Deploys External Secrets Operator & syncs secrets from remote vaults | Vault secrets materialized |
+| `make cloud-eks` / `cloud-gke`| Provisions hardened AWS EKS or GCP GKE clusters via Terraform | Production cloud cluster |
 | `make bench` | Runs CIS Kubernetes Benchmark via `kube-bench` in `kube-system` | CIS compliance report |
 | `make destroy` | Tears down the Kind cluster and purges local state | Clean host state |
 
@@ -240,3 +246,133 @@ make attack
 | **8** | **Runtime Exploitation** | Spawning interactive terminal shells inside container | Falco modern eBPF driver | **DETECTED IN KERNEL TELEMETRY** |
 
 The assault suite outputs a definitive defense score (100% resilience) and is suitable for CI/CD gates and red/blue team validation.
+
+---
+
+## 9. Automated Workload Hardening (`make harden`)
+
+Developers often struggle with the 12+ required securityContext and resource fields required by Gatekeeper and Pod Security Standards. SecureKube includes [`scripts/harden-manifest.py`](../scripts/harden-manifest.py), an automated AST-based manifest transformer:
+
+### Usage
+
+```bash
+# Preview hardened manifest in stdout
+make harden FILE=my-insecure-pod.yaml
+
+# Overwrite in-place
+make harden FILE=my-insecure-pod.yaml IN_PLACE=true
+
+# Output to a specific file
+make harden FILE=my-insecure-pod.yaml OUTPUT=my-hardened-pod.yaml
+```
+
+### What It Remediates Automatically
+- Injects Pod-level `runAsNonRoot: true`, `runAsUser: 10001`, `runAsGroup: 10001`, `fsGroup: 10001`, and `seccompProfile.type: RuntimeDefault`.
+- Injects Container-level `allowPrivilegeEscalation: false`, `readOnlyRootFilesystem: true`, and `capabilities.drop: ["ALL"]`.
+- Injects sensible default resource limits and requests (`cpu: 200m/50m`, `memory: 128Mi/64Mi`).
+- Rewrites privileged container ports (e.g. `80` -> `8080`, `443` -> `8443`) to prevent host port hijacking.
+- Adds an `emptyDir` scratch volume (`/tmp`) for read-only root filesystems requiring temp write space.
+
+---
+
+## 10. Native In-Tree CEL Admission Policies (`ValidatingAdmissionPolicy`)
+
+Starting in Kubernetes 1.30, admission control can be executed in-process inside `kube-apiserver` using Common Expression Language (CEL), bypassing webhook latencies (50–200ms) and avoiding webhook failure deadlocks.
+
+SecureKube deploys 8 native CEL policies located in [`kustomize/base/vap/`](../kustomize/base/vap/):
+1. `vap-no-privileged`: Prohibits `securityContext.privileged: true`.
+2. `vap-no-root`: Enforces `runAsNonRoot: true` or non-zero `runAsUser`.
+3. `vap-readonly-rootfs`: Enforces `readOnlyRootFilesystem: true`.
+4. `vap-no-hostpath`: Prohibits `hostPath` volume mounts.
+5. `vap-no-host-namespaces`: Prohibits `hostNetwork`, `hostPID`, and `hostIPC`.
+6. `vap-require-resources`: Enforces CPU and memory requests/limits.
+7. `vap-capabilities-and-ports`: Enforces `capabilities.drop: ["ALL"]` and port > 1024.
+8. `vap-allowed-registries`: Restricts container image registries to approved sources.
+
+### Deploying & Testing CEL Policies
+
+```bash
+# Deploy CEL policies and cluster-wide bindings
+make vap
+
+# Policies run in-tree alongside Gatekeeper and evaluate instantaneously
+kubectl apply -f examples/insecure-apps.yaml
+```
+
+---
+
+## 11. NetworkPolicy Auto-Discovery / Generator (`make generate-network-policy`)
+
+Debugging silent packet drops in zero-trust environments can stall developer velocity. SecureKube includes [`scripts/generate-network-policy.sh`](../scripts/generate-network-policy.sh) to auto-generate minimal least-privilege egress and ingress rules.
+
+### Usage
+
+```bash
+# Discover live ports and generate NetworkPolicy for a pod
+make generate-network-policy POD=my-app NAMESPACE=default
+```
+
+### Generated Policy Properties
+- Automatically extracts pod labels and container ports for ingress rules.
+- Automatically includes mandatory egress to CoreDNS (`kube-dns` on UDP/TCP port 53).
+- Implements strict default-deny for all unauthorized ingress and egress traffic.
+
+---
+
+## 12. External Secrets Operator (Local Fake Vault & Enterprise Sync)
+
+For enterprise environments using HashiCorp Vault, AWS Secrets Manager, or GCP Secret Manager, SecureKube integrates the **External Secrets Operator (ESO)**:
+
+### Architecture
+- Runs with hardened non-root container specs (`helm/external-secrets-values.yaml`).
+- Configures `ClusterSecretStore` ([`gitops/secrets/eso/cluster-secret-store.yaml`](../gitops/secrets/eso/cluster-secret-store.yaml)).
+- Local environments use the built-in `fake` provider for zero-cost, zero-dependency testing.
+- Includes pre-configured production blocks for Vault, AWS Secrets Manager, and GCP Secret Manager.
+
+### Deployment & Verification
+
+```bash
+# Deploy ESO and synchronize secrets
+make secrets-eso
+
+# Verify materialized secret
+kubectl get secret database-credentials-vault -n default -o yaml
+
+# Run workload consuming ESO synchronized secret
+kubectl apply -f examples/secure-app-with-vault-secret.yaml
+kubectl logs -n default pod/secure-app-with-vault-secret
+```
+
+---
+
+## 13. Production Cloud Provisioning (AWS EKS & GCP GKE)
+
+SecureKube provides production-ready Terraform modules to deploy the identical zero-trust security baseline onto managed hyperscaler cloud environments:
+
+### AWS EKS (`terraform/eks/`)
+- Encrypted control plane secrets via AWS KMS.
+- CIS control plane logging (api, audit, authenticator, controllerManager, scheduler).
+- Private cluster endpoint with managed public CIDR allow-listing.
+- Hardened managed node groups with IMDSv2 enforced (`http_tokens = "required"`, `http_put_response_hop_limit = 1`).
+- IAM Roles for Service Accounts (IRSA) via OIDC provider.
+- Automated SecureKube baseline bootstrapping via Helm provider.
+
+```bash
+cd terraform/eks
+terraform init
+terraform apply -var="cluster_name=prod-securekube"
+```
+
+### GCP GKE (`terraform/gke/`)
+- Datapath V2 enabled (Cilium eBPF CNI native integration).
+- Shielded GKE Nodes (Secure Boot & Integrity Monitoring).
+- Workload Identity enabled for zero-secret GCP API authentication.
+- Private cluster with authorized master networks.
+- Cloud KMS envelope encryption for Kubernetes secrets.
+- Automated SecureKube baseline bootstrapping via Helm provider.
+
+```bash
+cd terraform/gke
+terraform init
+terraform apply -var="cluster_name=prod-securekube"
+```

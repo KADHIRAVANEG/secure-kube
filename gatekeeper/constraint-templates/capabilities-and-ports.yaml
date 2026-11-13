@@ -27,21 +27,21 @@ spec:
         violation[{"msg": msg}] {
           c := input_containers[_]
           not drops_all(c)
-          msg := sprintf("container <%v> must drop ALL capabilities in securityContext.capabilities.drop", [c.name])
+          msg := sprintf("container <%v> must drop ALL capabilities in securityContext.capabilities.drop. Remediation: set 'capabilities: {drop: [\"ALL\"]}' or run 'make harden FILE=<manifest>'", [c.name])
         }
 
         violation[{"msg": msg}] {
           c := input_containers[_]
           added := c.securityContext.capabilities.add[_]
           not added_is_allowed(added)
-          msg := sprintf("container <%v> adds capability <%v>, which is not in the allow-list", [c.name, added])
+          msg := sprintf("container <%v> adds capability <%v>, which is not in the allow-list. Remediation: remove '%v' from capabilities.add", [c.name, added, added])
         }
 
         violation[{"msg": msg}] {
           c := input_containers[_]
           p := c.ports[_]
           p.containerPort < 1024
-          msg := sprintf("container <%v> exposes privileged port <%v> (<1024)", [c.name, p.containerPort])
+          msg := sprintf("container <%v> exposes privileged port <%v> (<1024). Remediation: bind to a non-privileged port (>1024, e.g. 8080) and route through a Service", [c.name, p.containerPort])
         }
 
         drops_all(c) {

@@ -1,0 +1,19 @@
+# CIS 5.2.x / NSA-CISA Hardening Guide §3.1 — Native Kubernetes In-Tree CEL
+# Replaces external webhook round-trips with in-process API server validation.
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: securekube-cel-no-privileged
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  validations:
+    - expression: "!has(object.spec.containers) || object.spec.containers.all(c, !has(c.securityContext) || !has(c.securityContext.privileged) || c.securityContext.privileged == false)"
+      message: "[CEL:no-privileged] Privileged containers are forbidden. Remediation: set 'securityContext.privileged: false' or run 'make harden FILE=<manifest>'."
+    - expression: "!has(object.spec.containers) || object.spec.containers.all(c, !has(c.securityContext) || !has(c.securityContext.allowPrivilegeEscalation) || c.securityContext.allowPrivilegeEscalation == false)"
+      message: "[CEL:no-privilege-escalation] Privilege escalation is forbidden. Remediation: set 'securityContext.allowPrivilegeEscalation: false'."
