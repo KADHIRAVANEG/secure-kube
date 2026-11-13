@@ -176,6 +176,9 @@ make status               # health of every component + active constraints + rec
 make lint                 # static analysis: shellcheck, terraform fmt, YAML validation
 make test-offline         # offline Gatekeeper policy tests via gator CLI
 make test                 # live policy tests (negative tests rejected + positive test allowed)
+make attack               # simulate 8 real-world cyber attacks and verify defense resilience
+make secrets-init         # generate Age encryption keypair and configure .sops.yaml
+make secrets-apply        # decrypt on-the-fly and apply encrypted secrets into Kubernetes
 make bench                # CIS Benchmark score via kube-bench
 make dashboard            # port-forward Falco Sidekick UI to localhost:2802
 make dashboard-argocd     # port-forward Argo CD UI to localhost:8080 (prints admin password)
@@ -190,8 +193,10 @@ make destroy              # tear down everything
 ### Try the example workloads yourself
 
 ```bash
-kubectl apply -f examples/secure-app.yaml       # should succeed
-kubectl apply -f examples/insecure-apps.yaml    # every pod here should be rejected
+kubectl apply -f examples/secure-app.yaml              # should succeed
+kubectl apply -f examples/insecure-apps.yaml           # every pod here should be rejected
+make secrets-apply                                     # decrypts and applies database credentials
+kubectl apply -f examples/secure-app-with-secret.yaml  # runs compliant pod mounting decrypted secret
 ```
 
 ## Repository layout
@@ -217,7 +222,10 @@ securekube/
 │   │                                 no-hostpath, no-host-namespaces, require-resources,
 │   │                                 allowed-repos, capabilities-and-ports, require-signed-images
 │   └── constraints/                 activation of each template cluster-wide
-├── gitops/apps/                     Argo CD AppProjects and 11 declarative application manifests
+├── .sops.yaml                       SOPS encryption configuration & Age recipient rules
+├── gitops/
+│   ├── apps/                        Argo CD AppProjects and 11 declarative application manifests
+│   └── secrets/                     SOPS+Age encrypted Kubernetes Secrets (safe for Git)
 ├── helm/
 │   ├── gatekeeper-values.yaml       fail-open webhook (see docs/architecture.md), 3 replicas
 │   ├── falco-values.yaml            modern_ebpf driver, JSON output, sidekick UI
@@ -229,11 +237,14 @@ securekube/
 │   └── kustomization.yaml           Kustomize manifest bundling observability resources
 ├── examples/
 │   ├── secure-app.yaml              passes every policy layer -- proves the "happy path" works
+│   ├── secure-app-with-secret.yaml  hardened reference workload mounting decrypted SOPS secret
 │   ├── insecure-apps.yaml           8 pods, each violating exactly one constraint
 │   └── three-tier-app.yaml          reference multi-tier workload with isolated network policies
 ├── scripts/
 │   ├── test-policies.sh             live cluster negative + positive policy tests
 │   ├── test-offline.sh              offline Gatekeeper policy validation via gator CLI
+│   ├── simulate-attacks.sh          automated 8-vector offensive assault and defense verification
+│   ├── secrets-tool.sh              SOPS + Age encryption, decryption, and key management
 │   ├── install-argocd.sh            automated Argo CD bootstrap and app registration
 │   └── sign-images.sh               Cosign keyless/key-pair image signing utility
 ├── docs/
@@ -288,6 +299,8 @@ securekube/
 - [x] GitOps for Helm releases (Gatekeeper, Falco, Argo CD itself as Argo CD Applications)
 - [x] Image signing/verification via Cosign + Gatekeeper
 - [x] Per-workload egress NetworkPolicy allow-lists
+- [x] Secrets management via SOPS + Age encryption (GitOps zero-trust secrets)
+- [x] Automated Offensive Security Assault & Defense Verification (`make attack` 8 vectors)
 - [ ] EKS Terraform module (IAM Roles for Service Accounts, VPC CNI + NetworkPolicy)
 - [ ] GKE Terraform module (Workload Identity, GKE Sandbox / gVisor)
 - [ ] Secrets management via External Secrets Operator

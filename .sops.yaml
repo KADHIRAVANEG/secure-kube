@@ -1,0 +1,3 @@
+creation_rules:
+  - path_regex: .*\.enc\.ya?ml$
+    age: "age1v876hheuj9dswauawyrdp7xr6rahgrthrgtllgnlwucn07es4cts7jfqwg"

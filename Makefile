@@ -2,6 +2,7 @@ include config.env
 export
 
 .PHONY: deploy deploy-light destroy cluster policies gatekeeper falco argocd observability verify test bench \
+        attack secrets-init secrets-encrypt secrets-apply \
         status logs clean-logs dashboard dashboard-argocd dashboard-grafana dashboard-prometheus sync-policies sync-rbac \
         sync-gatekeeper sync-pod-security sync-helm-apps sync-all clean help
 
@@ -146,7 +147,19 @@ test-offline: ## Run offline Gatekeeper policy validation via gator
 test: ## Step 6: Test policies (negative + positive)
 	./scripts/test-policies.sh
 
+attack: ## Simulate 8 real-world cyber attacks and verify defense
+	./scripts/simulate-attacks.sh
+
 verify: test ## Alias for 'test' (back-compat)
+
+secrets-init: ## Initialize SOPS Age keypair and .sops.yaml config
+	./scripts/secrets-tool.sh init
+
+secrets-encrypt: ## Encrypt a plaintext Secret file (FILE=path [DEST=path])
+	./scripts/secrets-tool.sh encrypt $(FILE) $(DEST)
+
+secrets-apply: ## Decrypt on-the-fly and apply encrypted secrets into Kubernetes
+	./scripts/secrets-tool.sh apply
 
 bench: ## Step 6: Run kube-bench and report the CIS score
 	kubectl delete job kube-bench -n kube-system --ignore-not-found
