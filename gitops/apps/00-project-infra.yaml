@@ -13,6 +13,7 @@ spec:
     - https://argoproj.github.io/argo-helm
     - https://open-policy-agent.github.io/gatekeeper/charts
     - https://falcosecurity.github.io/charts
+    - https://prometheus-community.github.io/helm-charts
 
   destinations:
     - server: https://kubernetes.default.svc
@@ -21,6 +22,8 @@ spec:
       namespace: falco
     - server: https://kubernetes.default.svc
       namespace: argocd
+    - server: https://kubernetes.default.svc
+      namespace: monitoring
 
   # Infrastructure components need broad permissions to install CRDs, webhooks, and daemonsets
   clusterResourceWhitelist:

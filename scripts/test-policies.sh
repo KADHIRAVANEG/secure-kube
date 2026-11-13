@@ -13,6 +13,7 @@ cleanup() {
   kubectl delete -f examples/insecure-apps.yaml -n "${NAMESPACE}" --ignore-not-found >/dev/null 2>&1
   kubectl delete -f examples/secure-app.yaml -n "${NAMESPACE}" --ignore-not-found >/dev/null 2>&1
 }
+cleanup
 trap cleanup EXIT
 
 echo "== SecureKube policy verification =="

@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: securekube-monitoring
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: securekube-infra
+  sources:
+    - repoURL: https://prometheus-community.github.io/helm-charts
+      targetRevision: 93.2.2
+      chart: kube-prometheus-stack
+      helm:
+        valueFiles:
+          - $values/helm/kube-prometheus-stack-values.yaml
+    - repoURL: https://github.com/PLACEHOLDER/securekube
+      targetRevision: HEAD
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+      - ServerSideApply=true

@@ -124,12 +124,15 @@ Every policy layer (NetworkPolicy, RBAC, Pod Security Standards, Gatekeeper cons
 ```
 gitops/
 └── apps/
-    ├── project.yaml                     Argo CD AppProject (scoped source/destination allow-list)
+    ├── 00-project.yaml                  Argo CD AppProject for cluster policies & workloads
+    ├── 00-project-infra.yaml            Argo CD AppProject for Helm infrastructure controllers
     ├── calico-system-app.yaml           Calico CNI infrastructure application
     ├── gatekeeper-system-app.yaml       Gatekeeper controller Helm chart
     ├── gatekeeper-templates-app.yaml    OPA ConstraintTemplates
     ├── gatekeeper-constraints-app.yaml  OPA Constraints (cluster-wide enforcement)
     ├── falco-system-app.yaml            Falco & Sidekick UI Helm chart
+    ├── monitoring-helm-app.yaml         kube-prometheus-stack Helm release (Prometheus, Grafana, Alertmanager)
+    ├── observability-app.yaml           Observability Kustomize app (dashboards, rules, ServiceMonitor)
     ├── network-policies-app.yaml        Kustomize default-deny & DNS-allow network policies
     ├── pod-security-app.yaml            PSA namespace admission profiles
     ├── rbac-app.yaml                    Workload runtime least-privilege RBAC
@@ -139,12 +142,14 @@ gitops/
 Argo CD is installed as part of `make deploy`. Once up:
 
 ```bash
-make dashboard-argocd   # open UI at localhost:8080 (prints admin password)
-make sync-all           # trigger sync for every layer
-make sync-policies      # trigger sync for network policies only
-make sync-rbac          # RBAC only
-make sync-gatekeeper    # Gatekeeper templates + constraints
-make status             # shows Argo CD app health alongside everything else
+make dashboard-argocd    # open UI at localhost:8080 (prints admin password)
+make sync-all            # trigger sync across all policy and infrastructure layers
+make sync-policies       # trigger sync for network policies only
+make sync-rbac           # RBAC only
+make sync-gatekeeper     # Gatekeeper templates + constraints
+make sync-helm-apps      # Core Helm apps (Gatekeeper, Falco, Argo CD, Monitoring)
+make sync-observability  # Observability dashboards, rules, and ServiceMonitors
+make status              # shows Argo CD app health alongside everything else
 ```
 
 **What GitOps gives you here:**
@@ -168,7 +173,9 @@ Edit `config.env` to change the cluster name or toggle Calico/Falco before deplo
 
 ```bash
 make status               # health of every component + active constraints + recent violations
-make test                 # negative tests (insecure pods rejected) + positive test (secure pod allowed)
+make lint                 # static analysis: shellcheck, terraform fmt, YAML validation
+make test-offline         # offline Gatekeeper policy tests via gator CLI
+make test                 # live policy tests (negative tests rejected + positive test allowed)
 make bench                # CIS Benchmark score via kube-bench
 make dashboard            # port-forward Falco Sidekick UI to localhost:2802
 make dashboard-argocd     # port-forward Argo CD UI to localhost:8080 (prints admin password)
@@ -210,18 +217,25 @@ securekube/
 │   │                                 no-hostpath, no-host-namespaces, require-resources,
 │   │                                 allowed-repos, capabilities-and-ports, require-signed-images
 │   └── constraints/                 activation of each template cluster-wide
-├── gitops/apps/                     Argo CD AppProject and 9 declarative application manifests
+├── gitops/apps/                     Argo CD AppProjects and 11 declarative application manifests
 ├── helm/
 │   ├── gatekeeper-values.yaml       fail-open webhook (see docs/architecture.md), 3 replicas
-│   └── falco-values.yaml            modern_ebpf driver, JSON output, sidekick UI
+│   ├── falco-values.yaml            modern_ebpf driver, JSON output, sidekick UI
+│   └── kube-prometheus-stack-values.yaml tuned monitoring stack values (local Kind storage)
 ├── observability/
-│   └── dashboards/                  Grafana JSON dashboards (unified security & cluster overview)
+│   ├── dashboards/                  Grafana JSON dashboards (unified security & cluster overview)
+│   ├── alerts/                      PrometheusRules for Falco alerts
+│   ├── falco-servicemonitor.yaml    ServiceMonitor scraping Falco metrics
+│   └── kustomization.yaml           Kustomize manifest bundling observability resources
 ├── examples/
 │   ├── secure-app.yaml              passes every policy layer -- proves the "happy path" works
 │   ├── insecure-apps.yaml           8 pods, each violating exactly one constraint
 │   └── three-tier-app.yaml          reference multi-tier workload with isolated network policies
 ├── scripts/
-│   └── test-policies.sh             negative + positive policy tests
+│   ├── test-policies.sh             live cluster negative + positive policy tests
+│   ├── test-offline.sh              offline Gatekeeper policy validation via gator CLI
+│   ├── install-argocd.sh            automated Argo CD bootstrap and app registration
+│   └── sign-images.sh               Cosign keyless/key-pair image signing utility
 ├── docs/
 │   ├── architecture.md              the real reasoning behind every non-obvious decision
 │   ├── operations-guide.md          day-2 runbook, dashboard access, workload guide
