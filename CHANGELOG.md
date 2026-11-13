@@ -6,7 +6,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
-## [Unreleased] - v1.3.0
+## [1.5.0] - 2026-11-13
 
 ### Added
 - **Automated Security Assault & Defense Simulator**: Added [`scripts/simulate-attacks.sh`](scripts/simulate-attacks.sh) and `make attack` command simulating 8 distinct cyber attack vectors (privilege escalation, host escapes, hostNetwork MITM, untrusted registry supply chain, privileged port hijacking, memory exhaustion DoS, Calico cross-namespace pivoting, Falco eBPF runtime exploitation) with 100% defense resilience scoring.

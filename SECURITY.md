@@ -5,7 +5,8 @@
 | Version | Supported |
 |---------|-----------|
 | latest (main) | ✅ |
-| v1.0.x | ✅ |
+| v1.5.x | ✅ |
+| v1.4.x | ✅ |
 | older | ❌ |
 
 ## Reporting a vulnerability
