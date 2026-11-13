@@ -1,6 +1,6 @@
 # SecureKube GCP GKE Terraform Module
 
-Provisions a CIS-hardened Google Kubernetes Engine (GKE) cluster with Datapath V2, Shielded Nodes, and Workload Identity.
+Provisions a CIS-hardened Google Kubernetes Engine (GKE) cluster with Datapath V2 (Cilium eBPF), Shielded Nodes, Workload Identity, and Private Cluster architecture.
 
 ---
 
@@ -15,11 +15,39 @@ Provisions a CIS-hardened Google Kubernetes Engine (GKE) cluster with Datapath V
 
 ---
 
+## 📋 Input Variables
+
+| Variable | Description | Type | Default | Required |
+|---|---|---|---|---|
+| `project_id` | GCP Project ID | `string` | — | yes |
+| `region` | GCP Compute Region | `string` | `"us-central1"` | no |
+| `cluster_name` | Name of the GKE cluster | `string` | `"securekube-gke"` | no |
+| `network` | VPC Network name | `string` | `"default"` | no |
+| `subnetwork` | VPC Subnetwork name | `string` | `"default"` | no |
+| `node_count` | Number of worker nodes per zone | `number` | `3` | no |
+| `machine_type` | Compute Engine instance type | `string` | `"e2-standard-4"` | no |
+
+---
+
+## 📤 Outputs
+
+| Output | Description |
+|---|---|
+| `cluster_name` | The GKE cluster identifier |
+| `cluster_endpoint` | The IP address of the Kubernetes API server |
+| `ca_certificate` | Base64-encoded public CA certificate of the cluster |
+| `workload_identity_pool` | Workload Identity Pool for GCP IAM bindings |
+
+---
+
 ## 🚀 Usage
 
 ```bash
 cd terraform/gke
 terraform init
-terraform plan -var="project_id=my-gcp-project"
+
+# Plan with your GCP project
+terraform plan -var="project_id=my-hardened-gcp-project"
+
 terraform apply -auto-approve
 ```

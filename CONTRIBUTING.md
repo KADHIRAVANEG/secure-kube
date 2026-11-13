@@ -51,7 +51,7 @@ We are NOT currently looking for:
 terraform >= 1.5.0
 kubectl >= 1.30.0
 helm >= 3.14.0
-kind >= 0.24.0
+kind >= 0.27.0
 docker (with your user in the docker group)
 ```
 
@@ -61,7 +61,16 @@ Or use the container image — no local installs needed:
 docker run --rm -it \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v $(pwd):/workspace -w /workspace \
-  ghcr.io/joker-53/secure-kube:latest bash
+  ghcr.io/kadhiravaneg/secure-kube:latest bash
+```
+
+Or from Docker Hub:
+
+```bash
+docker run --rm -it \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v $(pwd):/workspace -w /workspace \
+  joker53/secure-kube:latest bash
 ```
 
 ### Fork and clone
@@ -138,15 +147,19 @@ ci: add Trivy vulnerability scan to release workflow
 
 ## Testing requirements
 
-Every PR that changes a policy, constraint, or security control must:
+Every PR that changes a policy, constraint, script, or security control must:
 
+- Pass static linting: `make lint` (ShellCheck, Terraform formatting, YAML validation)
+- Pass offline policy validation: `make test-offline` (`gator test` v3.18.0)
 - Add a corresponding test case in `scripts/test-policies.sh` OR explain why one isn't needed
-- Pass `make test` (all 9 policy checks green)
+- Pass live admission testing: `make test` (all 9 policy checks green)
+- Pass the security assault simulation: `make attack` (all 8 attack vectors repelled)
 - Pass CI (GitHub Actions runs automatically on every PR)
 
 For new Gatekeeper constraints specifically:
-- Add the `ConstraintTemplate` in `gatekeeper/constraint-templates/`
-- Add the `Constraint` in `gatekeeper/constraints/` with `argocd`, `gatekeeper-system`, `falco`, `kube-system`, `calico-system`, `monitoring`, `local-path-storage` in `excludedNamespaces`
+- Add the `ConstraintTemplate` in `gatekeeper/constraint-templates/` with enriched remediation guidance
+- Add the `Constraint` in `gatekeeper/constraints/` with `argocd`, `gatekeeper-system`, `falco`, `kube-system`, `calico-system`, `monitoring`, `local-path-storage`, `external-secrets` in `excludedNamespaces`
+- If applicable, add a corresponding native in-tree CEL `ValidatingAdmissionPolicy` in `kustomize/base/vap/`
 - Add a negative test pod in `examples/insecure-apps.yaml`
 - Add the pod name to the `EXPECTED_REJECTED` list in `scripts/test-policies.sh`
 - Document the threat vector mitigated in `docs/architecture.md`

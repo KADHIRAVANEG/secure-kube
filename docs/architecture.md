@@ -31,6 +31,31 @@ We initially set `validatingWebhookFailurePolicy: Fail` (see the now-outdated re
 
 Switching to `Ignore` breaks that deadlock: if the webhook is down, requests proceed unvalidated rather than hanging forever. The real cost is a brief enforcement gap any time the webhook pod restarts (e.g. after a node reboot, before Kubernetes reschedules it) — worth knowing if you're relying on this for a real security boundary, not just a demo/portfolio cluster. If you need genuinely fail-closed behavior, the correct fix is upstream: exclude Gatekeeper's own namespace from Calico's admission-relevant object creation entirely (a Calico/Gatekeeper compatibility concern, not something this project's config can fully solve on its own).
 
+## Compensating Control: Native In-Tree CEL Admission Policies (`ValidatingAdmissionPolicy`)
+
+To eliminate the brief enforcement gap caused by Gatekeeper's fail-open webhook and eliminate external webhook latency (50–200ms per admission request), SecureKube introduces **Kubernetes 1.30+ in-tree CEL ValidatingAdmissionPolicies** in `kustomize/base/vap/`.
+
+### The In-Tree vs. Webhook Architecture
+
+```
+Incoming Request -> [ kube-apiserver ]
+                         |
+                         +---> 1. In-Tree CEL Evaluation (Sub-millisecond, In-Process)
+                         |        [vap-no-privileged, vap-no-root, vap-readonly-rootfs, etc.]
+                         |        (Rejects immediately if non-compliant; ZERO network roundtrips)
+                         |
+                         +---> 2. External Webhook Evaluation (Out-of-Process over HTTPS)
+                                  [Gatekeeper Webhook Service]
+                                  (Deep Rego inspection, Cosign signatures, violation auditing)
+```
+
+### Key Architectural Advantages:
+1. **Zero External Network Hops**: Evaluated in-memory inside `kube-apiserver`, slashing admission latency from >100ms down to microseconds.
+2. **Zero Webhook Deadlock Risk**: Because CEL policies execute in-process, they never deadlock against CNI IPAM CRDs or webhook pod cold-starts.
+3. **Dual-Layer Defense**: CEL acts as an instantaneous in-tree filter for core security constraints, while Gatekeeper provides extensible Rego policies, comprehensive audit logging (`gatekeeper_violations`), and Cosign signature verification.
+
+---
+
 ## Why the Gatekeeper layer has 9 constraints, not 3
 
 The first pass only blocked root/privileged/writable-rootfs — a real attacker doesn't need any of those if `hostPath` mounting `/` is left open, or if a pod can set `hostNetwork: true` and see every other pod's traffic on the node. The current set closes the highest-value gaps beyond what PSA's "restricted" profile alone covers:
@@ -80,6 +105,71 @@ Security without observability creates an operational blind spot. SecureKube com
 ## Audit logging scope
 
 `terraform/kind/audit-policy.yaml` logs full request/response bodies only for `secrets`, `configmaps`, and RBAC objects — the resources where a full body matters for a security investigation — and only request metadata for everything else, to keep log volume manageable while still satisfying CIS 3.2.x.
+
+## Enterprise Secret Management: SOPS+Age vs. External Secrets Operator (ESO)
+
+SecureKube provides two complementary, production-grade secrets patterns tailored to different operational environments:
+
+### 1. Developer Workstation & Local GitOps: Mozilla SOPS + Age
+- **Use Case**: Local development, CI/CD pipelines, and standalone GitOps repositories without enterprise vault infrastructure.
+- **Mechanism**: The repository contains `.sops.yaml` with public Age recipient keys. Secret manifests are encrypted client-side (`make secrets-encrypt`). Sensitive payload data is encrypted via AES-256-GCM while metadata remains intact for Git versioning. Decryption happens on-the-fly (`make secrets-apply`) or in-cluster via the KSOPS plugin.
+
+### 2. Multi-Cloud & Enterprise Vault Sync: External Secrets Operator (ESO)
+- **Use Case**: Enterprise production clusters where developers should never handle encryption keys or decrypt raw secrets on their laptops.
+- **Mechanism**: ESO runs in-cluster (`helm/external-secrets-values.yaml`) with a hardened, non-root pod specification. A `ClusterSecretStore` connects directly to upstream secret providers:
+  - **Local/CI**: `fake` provider with zero external dependencies and zero cloud billing.
+  - **AWS**: AWS Secrets Manager authenticated via IAM Roles for Service Accounts (IRSA).
+  - **GCP**: GCP Secret Manager authenticated via Workload Identity.
+  - **On-Premise / Multi-Cloud**: HashiCorp Vault authenticated via Kubernetes ServiceAccount tokens.
+- **Dynamic Rotation**: ESO polls upstream vaults at configured intervals (e.g., `refreshInterval: 1h`) and automatically synchronizes Kubernetes `Secret` objects, decoupling secret lifecycle from Git commits.
+
+---
+
+## NetworkPolicy Auto-Discovery: Overcoming the Zero-Trust Blackhole
+
+Default-deny networking is the gold standard of zero-trust Kubernetes security, but it often frustrates developers: when a pod is blocked by a NetworkPolicy, packets drop silently without error messages. Applications fail with cryptic `i/o timeout` or `Connection refused` errors.
+
+To solve this operational friction, SecureKube implements a two-fold solution:
+1. **Calico Dropped Packet Observability**: Calico Felix Prometheus metrics are exported on port 9091, enabling real-time monitoring of dropped packet counters in Prometheus and Grafana.
+2. **Automated Discovery & Generator (`scripts/generate-network-policy.sh`)**: Rather than guessing egress rules, developers run `make generate-network-policy POD=<name>`. The generator:
+   - Queries live container specs and runtime ports.
+   - Extracts existing pod labels for targeted `podSelector` matching.
+   - Automatically injects mandatory CoreDNS egress (UDP/TCP port 53 to `kube-dns`).
+   - Produces a minimal, least-privilege `NetworkPolicy` ready for immediate application or commit into GitOps.
+
+---
+
+## Automated Workload Hardening Architecture
+
+Rather than rejecting non-compliant manifests at admission and forcing developers through frustrating trial-and-error cycles, SecureKube provides an automated manifest transformer (`scripts/harden-manifest.py`).
+
+### Design Principles:
+- **Preserve Developer Intent**: Uses PyYAML to load manifests as structured trees, mutating only the necessary fields while preserving custom labels, annotations, volume mounts, and container arguments.
+- **Complete AST Injection**: Automatically injects all 12 required securityContext fields:
+  - Pod: `runAsNonRoot: true`, `runAsUser: 10001`, `runAsGroup: 10001`, `fsGroup: 10001`, `seccompProfile: RuntimeDefault`.
+  - Container: `allowPrivilegeEscalation: false`, `readOnlyRootFilesystem: true`, `capabilities.drop: ["ALL"]`.
+  - Resources: sensible default requests (`cpu: 50m`, `memory: 64Mi`) and limits (`cpu: 200m`, `memory: 128Mi`).
+- **Privileged Port Remapping**: Identifies reserved ports (< 1024) like 80 or 443 and remaps them to unprivileged equivalents (8080, 8443) to prevent `CAP_NET_BIND_SERVICE` privilege escalation.
+- **Scratch Space Emulation**: Automatically attaches an in-memory `emptyDir` volume at `/tmp` so read-only root filesystems don't break applications requiring temporary write space.
+
+---
+
+## Multi-Cloud Parity Architecture: AWS EKS & GCP GKE
+
+To ensure that security controls verified locally on Kind translate seamlessly to enterprise production environments, SecureKube provides production-hardened Terraform modules for AWS and GCP:
+
+| Architectural Component | Local Kind Stack | AWS EKS (`terraform/eks/`) | GCP GKE (`terraform/gke/`) |
+|---|---|---|---|
+| **Cluster Provisioning** | Kind CLI via Terraform | AWS EKS Managed Cluster | GKE Private Cluster |
+| **Control Plane Audit** | `audit-policy.yaml` mounted | CloudWatch CIS Control Plane Logs | Cloud Logging CIS Audit Export |
+| **Secret Encryption** | Kind etcd / SOPS / ESO | AWS KMS Customer Managed Key | Cloud KMS Envelope Encryption |
+| **Network Fabric** | Calico CNI + NetworkPolicy | AWS VPC CNI + NetworkPolicy | Datapath V2 (Cilium eBPF) |
+| **Node Hardening** | Docker container node | IMDSv2 Enforced (`http_tokens`) | Shielded GKE Nodes (Secure Boot) |
+| **Identity & IAM** | ServiceAccount Tokens | IAM Roles for Service Accounts (IRSA) | Workload Identity Federation |
+| **Policy Enforcement** | Gatekeeper + In-Tree CEL | Gatekeeper + In-Tree CEL | Gatekeeper + In-Tree CEL |
+| **Runtime Detection** | Falco modern eBPF | Falco modern eBPF | Falco modern eBPF |
+
+---
 
 ## Smaller lessons worth keeping
 

@@ -110,3 +110,33 @@ kubectl describe networkpolicy default-deny-all -n default
 # Live connection probe from a test pod
 kubectl run test-probe --rm -it --image=busybox:1.36 --restart=Never -- nslookup kubernetes.default
 ```
+
+---
+
+## Automated Policy Generation (`make generate-network-policy`)
+
+Debugging silent packet drops in zero-trust environments can stall developer velocity. SecureKube includes [`scripts/generate-network-policy.sh`](../scripts/generate-network-policy.sh) to auto-generate minimal least-privilege egress and ingress rules directly from running pods or staging environments.
+
+### Usage
+
+```bash
+# Auto-generate minimal policy for a running pod
+make generate-network-policy POD=secure-app NAMESPACE=default
+
+# Or run the script directly with custom output destination
+./scripts/generate-network-policy.sh my-service my-namespace > kustomize/base/network-policies/my-service-policy.yaml
+```
+
+### What It Generates
+1. **Targeted Selector**: Matches the specific pod labels (`matchLabels`).
+2. **Ingress Allow-List**: Permits ingress traffic strictly on the container ports declared in the pod specification.
+3. **Mandatory CoreDNS Egress**: Injects UDP and TCP port 53 egress to `kube-dns` in `kube-system`, preventing DNS resolution failures.
+4. **Default-Deny Boundary**: Isolates all other unauthorized traffic automatically.
+
+---
+
+## Calico Dropped Packet Observability
+
+Calico Felix Prometheus metrics are exported on port 9091 across all nodes. In Grafana:
+- Navigate to the **Cluster Overview** or **Security Dashboard** at `http://localhost:3000`.
+- Monitor the **Blocked Network Flows** panel (`felix_dropped_packets_total`) to correlate dropped application connections directly with active NetworkPolicy rules instead of guessing.

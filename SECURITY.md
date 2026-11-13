@@ -5,6 +5,7 @@
 | Version | Supported |
 |---------|-----------|
 | latest (main) | ✅ |
+| v1.6.x | ✅ |
 | v1.5.x | ✅ |
 | v1.4.x | ✅ |
 | older | ❌ |
@@ -24,15 +25,15 @@ We will respond within 72 hours and aim to release a fix within 14 days for conf
 
 This project is a **local development / reference implementation**. Please report:
 
-- Vulnerabilities in the container image (`ghcr.io/joker-53/secure-kube`)
-- Gatekeeper constraints that can be bypassed in ways not already documented
+- Vulnerabilities in the container image (`ghcr.io/kadhiravaneg/secure-kube` or `joker53/secure-kube`)
+- Gatekeeper constraints or CEL admission policies that can be bypassed in ways not already documented
 - CI/CD workflow vulnerabilities (secret exposure, injection attacks)
 - Incorrect security documentation that could mislead users into unsafe configurations
 
 Out of scope:
 
 - CIS benchmark failures on `kind` that are documented in `docs/architecture.md`
-- The fail-open Gatekeeper webhook (documented trade-off)
+- The fail-open Gatekeeper webhook (compensated by in-tree CEL admission policies)
 - Anonymous auth being enabled (documented trade-off)
 - Vulnerabilities in upstream tools (report to Terraform, Gatekeeper, Falco, etc. directly)
 
@@ -42,8 +43,9 @@ These are intentional, documented decisions — not vulnerabilities:
 
 | Trade-off | Reason | Reference |
 |---|---|---|
-| Gatekeeper webhook is fail-open | Calico IPAM deadlock with fail-closed | `docs/architecture.md` |
+| Gatekeeper webhook is fail-open | Calico IPAM deadlock with fail-closed (mitigated by in-tree CEL policies) | `docs/architecture.md` |
 | `anonymous-auth` enabled | kubeadm join bootstrap token requires it | `docs/architecture.md` |
 | CIS benchmark partially fails | kind cannot satisfy node-level controls | `README.md` |
 | Permissive allowed-repos list | Bundled examples need public registries | `gatekeeper/constraints/allowed-repos-constraint.yaml` |
 | `local-path-storage` excluded from constraints | Kind dynamic volume provisioner helper pod requires hostPath | `docs/architecture.md` |
+| `external-secrets` excluded from constraints | External Secrets Operator webhook and cert-controller require system permissions | `docs/architecture.md` |

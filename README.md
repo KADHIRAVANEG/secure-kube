@@ -297,6 +297,9 @@ securekube/
 - **[Architecture Deep-Dive](docs/architecture.md)** — Rationale behind security controls, trade-offs (`anonymous-auth`, fail-open webhook), and lessons learned.
 - **[Operations & Day-2 Guide](docs/operations-guide.md)** — Practical runbook for cluster access, dashboard credentials, compliant workload authoring, and troubleshooting.
 - **[Network Policies Guide](network-policies/README.md)** — Zero-trust template index and multi-tier application reference.
+- **[External Secrets Operator Guide](gitops/secrets/eso/README.md)** — Setup and provider configurations for HashiCorp Vault, AWS Secrets Manager, and GCP Secret Manager.
+- **[AWS EKS Terraform Guide](terraform/eks/README.md)** — Production AWS EKS module with KMS encryption, CIS logging, and IRSA.
+- **[GCP GKE Terraform Guide](terraform/gke/README.md)** — Production GCP GKE module with Datapath V2, Shielded Nodes, and Workload Identity.
 - **[Contributing Guide](CONTRIBUTING.md)** — Contribution workflow, commit conventions, Gatekeeper constraint checklist, and test requirements.
 - **[Security Policy](SECURITY.md)** — Vulnerability reporting protocol and documented trade-offs.
 - **[Changelog](CHANGELOG.md)** — Keep a Changelog tracking releases, features, and fixes.
