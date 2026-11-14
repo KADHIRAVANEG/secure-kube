@@ -17,6 +17,8 @@
 # ── Stage 1: download all tool binaries ──────────────────────────────
 FROM alpine:3.21 AS downloader
 
+ARG TARGETARCH=amd64
+
 RUN apk add --no-cache curl unzip bash
 
 WORKDIR /tools
@@ -28,29 +30,29 @@ ENV TERRAFORM_VERSION=1.15.8 \
     ARGOCD_VERSION=3.0.6
 
 # Terraform
-RUN curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" \
+RUN curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_${TARGETARCH}.zip" \
       -o terraform.zip \
     && unzip terraform.zip \
     && rm terraform.zip \
     && chmod +x terraform
 
 # kubectl
-RUN curl -fsSL "https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl" \
+RUN curl -fsSL "https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/${TARGETARCH}/kubectl" \
       -o kubectl \
     && chmod +x kubectl
 
 # Helm
-RUN curl -fsSL "https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz" \
-      | tar -xz --strip-components=1 linux-amd64/helm \
+RUN curl -fsSL "https://get.helm.sh/helm-v${HELM_VERSION}-linux-${TARGETARCH}.tar.gz" \
+      | tar -xz --strip-components=1 linux-${TARGETARCH}/helm \
     && chmod +x helm
 
 # kind
-RUN curl -fsSL "https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64" \
+RUN curl -fsSL "https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-${TARGETARCH}" \
       -o kind \
     && chmod +x kind
 
 # Argo CD CLI
-RUN curl -fsSL "https://github.com/argoproj/argo-cd/releases/download/v${ARGOCD_VERSION}/argocd-linux-amd64" \
+RUN curl -fsSL "https://github.com/argoproj/argo-cd/releases/download/v${ARGOCD_VERSION}/argocd-linux-${TARGETARCH}" \
       -o argocd \
     && chmod +x argocd
 
