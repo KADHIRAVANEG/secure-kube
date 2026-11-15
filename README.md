@@ -1,8 +1,8 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/banner-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="docs/assets/banner.svg">
-    <img alt="SecureKube Banner" src="docs/assets/banner.svg" width="100%">
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/banner-dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="docs/assets/banner-light.png">
+    <img alt="secure-kube" src="docs/assets/banner-dark.png" width="600">
   </picture>
 </p>
 
