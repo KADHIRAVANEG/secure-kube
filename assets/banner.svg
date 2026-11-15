@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 180" width="840" height="180">
+  <defs>
+    <linearGradient id="bannerBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+    <linearGradient id="iconBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366F1" />
+      <stop offset="100%" stop-color="#4338CA" />
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#38BDF8" />
+    </linearGradient>
+  </defs>
+
+  <!-- Container Box with Subtle Border -->
+  <rect width="840" height="180" rx="16" fill="url(#bannerBgGrad)" stroke="#1E293B" stroke-width="2" />
+
+  <!-- Left: Squircle App Icon Badge -->
+  <g transform="translate(35, 25)">
+    <rect width="130" height="130" rx="28" fill="url(#iconBgGrad)" />
+    <!-- Mini Shield -->
+    <path d="M 65 14 
+             L 106 28 
+             C 106 70 90 99 65 114 
+             C 40 99 24 70 24 28 
+             Z" 
+          fill="none" 
+          stroke="#FFFFFF" 
+          stroke-width="4" 
+          stroke-linejoin="round" />
+  </g>
+
+  <!-- Mini Helm embedded in badge (centered at x=100, y=90) -->
+  
+    <!-- Helm Rim -->
+    <circle cx="100" cy="90" r="41.3" fill="none" stroke="#FFFFFF" stroke-width="5.8" />
+    <!-- 7 Radial Spokes -->
+    <line x1="100.0" y1="71.8" x2="100.0" y2="33.4" stroke="#FFFFFF" stroke-width="5.8" stroke-linecap="round" />
+    <line x1="114.3" y1="78.6" x2="144.3" y2="54.7" stroke="#FFFFFF" stroke-width="5.8" stroke-linecap="round" />
+    <line x1="117.8" y1="94.1" x2="155.2" y2="102.6" stroke="#FFFFFF" stroke-width="5.8" stroke-linecap="round" />
+    <line x1="107.9" y1="106.4" x2="124.6" y2="141.0" stroke="#FFFFFF" stroke-width="5.8" stroke-linecap="round" />
+    <line x1="92.1" y1="106.4" x2="75.4" y2="141.0" stroke="#FFFFFF" stroke-width="5.8" stroke-linecap="round" />
+    <line x1="82.2" y1="94.1" x2="44.8" y2="102.6" stroke="#FFFFFF" stroke-width="5.8" stroke-linecap="round" />
+    <line x1="85.7" y1="78.6" x2="55.7" y2="54.7" stroke="#FFFFFF" stroke-width="5.8" stroke-linecap="round" />
+    <!-- Handles -->
+    <circle cx="100.0" cy="33.4" r="5.0" fill="#38BDF8" stroke="#FFFFFF" stroke-width="1.4" />
+    <circle cx="144.3" cy="54.7" r="5.0" fill="#38BDF8" stroke="#FFFFFF" stroke-width="1.4" />
+    <circle cx="155.2" cy="102.6" r="5.0" fill="#38BDF8" stroke="#FFFFFF" stroke-width="1.4" />
+    <circle cx="124.6" cy="141.0" r="5.0" fill="#38BDF8" stroke="#FFFFFF" stroke-width="1.4" />
+    <circle cx="75.4" cy="141.0" r="5.0" fill="#38BDF8" stroke="#FFFFFF" stroke-width="1.4" />
+    <circle cx="44.8" cy="102.6" r="5.0" fill="#38BDF8" stroke="#FFFFFF" stroke-width="1.4" />
+    <circle cx="55.7" cy="54.7" r="5.0" fill="#38BDF8" stroke="#FFFFFF" stroke-width="1.4" />
+    <!-- Center Hub -->
+    <circle cx="100" cy="90" r="18.2" fill="#3730A3" stroke="#FFFFFF" stroke-width="2.9" />
+    
+    <!-- Zero-Trust Padlock Core -->
+    <path d="M 95.7 88.6 V 84.2 C 95.7 81.4 104.3 81.4 104.3 88.6 V 88.6" 
+          fill="none" stroke="#38BDF8" stroke-width="1.7" stroke-linecap="round" />
+    <rect x="92.8" y="88.1" width="14.4" height="10.6" rx="1.9" fill="#38BDF8" />
+    <circle cx="100.0" cy="92.4" r="1.2" fill="#3730A3" />
+    <polygon points="99.3,92.4 100.7,92.4 101.0,95.8 99.0,95.8" fill="#3730A3" />
+
+
+
+  <!-- Right: Typography & Brand Hierarchy -->
+  <text x="195" y="68" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-weight="800" font-size="40" fill="#FFFFFF" letter-spacing="-0.5">
+    Secure<tspan fill="#38BDF8">Kube</tspan>
+  </text>
+
+  <text x="195" y="98" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-weight="500" font-size="16" fill="#94A3B8" letter-spacing="0.2">
+    Enterprise Zero-Trust Kubernetes Blueprint &amp; Active eBPF Defense
+  </text>
+
+  <!-- Clean Tech Badges / Pills -->
+  <!-- Pill 1: CIS 1.30 -->
+  <g transform="translate(195, 118)">
+    <rect width="136" height="26" rx="13" fill="#1E293B" stroke="#334155" stroke-width="1" />
+    <circle cx="14" cy="13" r="4" fill="#10B981" />
+    <text x="26" y="17.5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="600" font-size="11" fill="#E2E8F0">CIS 1.30 Hardened</text>
+  </g>
+
+  <!-- Pill 2: Falco Talon -->
+  <g transform="translate(341, 118)">
+    <rect width="144" height="26" rx="13" fill="#1E293B" stroke="#334155" stroke-width="1" />
+    <circle cx="14" cy="13" r="4" fill="#818CF8" />
+    <text x="26" y="17.5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="600" font-size="11" fill="#E2E8F0">Falco Talon Active</text>
+  </g>
+
+  <!-- Pill 3: SLSA Level 3 -->
+  <g transform="translate(495, 118)">
+    <rect width="128" height="26" rx="13" fill="#1E293B" stroke="#334155" stroke-width="1" />
+    <circle cx="14" cy="13" r="4" fill="#38BDF8" />
+    <text x="26" y="17.5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="600" font-size="11" fill="#E2E8F0">SLSA 3 Attested</text>
+  </g>
+
+  <!-- Pill 4: 100% Local -->
+  <g transform="translate(633, 118)">
+    <rect width="120" height="26" rx="13" fill="#1E293B" stroke="#334155" stroke-width="1" />
+    <circle cx="14" cy="13" r="4" fill="#F59E0B" />
+    <text x="26" y="17.5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="600" font-size="11" fill="#E2E8F0">100% Local Kind</text>
+  </g>
+</svg>
