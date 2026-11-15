@@ -1,7 +1,11 @@
 # SecureKube
 
 <p align="center">
-  <img src="assets/banner.svg" alt="SecureKube Banner" width="100%">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="assets/banner.svg">
+    <img alt="SecureKube Banner" src="assets/banner.svg" width="100%">
+  </picture>
 </p>
 
 <p align="center">
