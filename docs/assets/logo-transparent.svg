@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="shieldGradTrans" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#6366F1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Protective Outer Shield -->
+  <path d="M 256 56 
+           L 416 112 
+           C 416 278 354 394 256 454 
+           C 158 394 96 278 96 112 
+           Z" 
+        fill="#0F172A" 
+        stroke="url(#shieldGradTrans)" 
+        stroke-width="16" 
+        stroke-linejoin="round" />
+
+  
+    <!-- Helm Rim -->
+    <circle cx="256" cy="254" r="86.0" fill="none" stroke="#FFFFFF" stroke-width="12.0" />
+    <!-- 7 Radial Spokes -->
+    <line x1="256.0" y1="216.0" x2="256.0" y2="136.0" stroke="#FFFFFF" stroke-width="12.0" stroke-linecap="round" />
+    <line x1="285.7" y1="230.3" x2="348.3" y2="180.4" stroke="#FFFFFF" stroke-width="12.0" stroke-linecap="round" />
+    <line x1="293.0" y1="262.5" x2="371.0" y2="280.3" stroke="#FFFFFF" stroke-width="12.0" stroke-linecap="round" />
+    <line x1="272.5" y1="288.2" x2="307.2" y2="360.3" stroke="#FFFFFF" stroke-width="12.0" stroke-linecap="round" />
+    <line x1="239.5" y1="288.2" x2="204.8" y2="360.3" stroke="#FFFFFF" stroke-width="12.0" stroke-linecap="round" />
+    <line x1="219.0" y1="262.5" x2="141.0" y2="280.3" stroke="#FFFFFF" stroke-width="12.0" stroke-linecap="round" />
+    <line x1="226.3" y1="230.3" x2="163.7" y2="180.4" stroke="#FFFFFF" stroke-width="12.0" stroke-linecap="round" />
+    <!-- Handles -->
+    <circle cx="256.0" cy="136.0" r="10.5" fill="#00F0FF" stroke="#FFFFFF" stroke-width="3.0" />
+    <circle cx="348.3" cy="180.4" r="10.5" fill="#00F0FF" stroke="#FFFFFF" stroke-width="3.0" />
+    <circle cx="371.0" cy="280.3" r="10.5" fill="#00F0FF" stroke="#FFFFFF" stroke-width="3.0" />
+    <circle cx="307.2" cy="360.3" r="10.5" fill="#00F0FF" stroke="#FFFFFF" stroke-width="3.0" />
+    <circle cx="204.8" cy="360.3" r="10.5" fill="#00F0FF" stroke="#FFFFFF" stroke-width="3.0" />
+    <circle cx="141.0" cy="280.3" r="10.5" fill="#00F0FF" stroke="#FFFFFF" stroke-width="3.0" />
+    <circle cx="163.7" cy="180.4" r="10.5" fill="#00F0FF" stroke="#FFFFFF" stroke-width="3.0" />
+    <!-- Center Hub -->
+    <circle cx="256" cy="254" r="38.0" fill="#0F172A" stroke="#FFFFFF" stroke-width="6.0" />
+    
+    <!-- Zero-Trust Padlock Core -->
+    <path d="M 247.0 251.0 V 242.0 C 247.0 236.0 265.0 236.0 265.0 251.0 V 251.0" 
+          fill="none" stroke="#00F0FF" stroke-width="3.5" stroke-linecap="round" />
+    <rect x="241.0" y="250.0" width="30.0" height="22.0" rx="4.0" fill="#00F0FF" />
+    <circle cx="256.0" cy="259.0" r="2.5" fill="#0F172A" />
+    <polygon points="254.5,259.0 257.5,259.0 258.0,266.0 254.0,266.0" fill="#0F172A" />
+
+
+</svg>

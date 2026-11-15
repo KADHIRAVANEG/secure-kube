@@ -1,7 +1,7 @@
 # SecureKube
 
 <p align="center">
-  <img src="assets/securekube-banner.jpg" alt="SecureKube Banner" width="100%">
+  <img src="assets/banner.svg" alt="SecureKube Banner" width="100%">
 </p>
 
 <p align="center">
