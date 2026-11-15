@@ -1,0 +1,1945 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Enterprise-Grade, CIS-Hardened Kubernetes Security Blueprint">
+      
+      
+        <meta name="author" content="Kadhiravan E G">
+      
+      
+        <link rel="canonical" href="https://kadhiravaneg.github.io/secure-kube/architecture/">
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../operations-guide/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
+    
+    
+      
+        <title>Architecture & 7 Defense Layers - SecureKube</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="cyan">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#architecture-notes" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="SecureKube" class="md-header__button md-logo" aria-label="SecureKube" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SecureKube
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Architecture & 7 Defense Layers
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="cyan"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="cyan"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/KADHIRAVANEG/secure-kube" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    KADHIRAVANEG/secure-kube
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href=".." class="md-tabs__link">
+          
+  
+  
+  Overview
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../operations-guide/" class="md-tabs__link">
+          
+  
+  
+  Operations & Runbooks
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../networking/" class="md-tabs__link">
+          
+  
+  
+  Security Controls
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../cloud/eks/" class="md-tabs__link">
+          
+  
+  
+  Multi-Cloud Deployment
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../contributing/" class="md-tabs__link">
+          
+  
+  
+  Project Governance
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="SecureKube" class="md-nav__button md-logo" aria-label="SecureKube" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    SecureKube
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/KADHIRAVANEG/secure-kube" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    KADHIRAVANEG/secure-kube
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Overview
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture & 7 Defense Layers
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture & 7 Defense Layers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-anonymous-auth-is-not-disabled-on-the-api-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why anonymous-auth is NOT disabled on the API server
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-the-terraform-layer-shells-out-to-the-kind-cli-instead-of-using-the-tehcyxkind-provider" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why the Terraform layer shells out to the kind CLI instead of using the tehcyx/kind provider
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-default-deny-calico-on-kind" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why default-deny + Calico on kind
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-two-enforcement-layers-psa-gatekeeper" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why two enforcement layers (PSA + Gatekeeper)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-rbac-ships-a-workload-runtime-role-instead-of-relying-only-on-defaults" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why RBAC ships a workload-runtime Role instead of relying only on defaults
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-the-webhook-is-fail-open-ignore-not-fail-closed-fail-corrected" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why the webhook is fail-open (Ignore), not fail-closed (Fail) — corrected
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compensating-control-native-in-tree-cel-admission-policies-validatingadmissionpolicy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compensating Control: Native In-Tree CEL Admission Policies (ValidatingAdmissionPolicy)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Compensating Control: Native In-Tree CEL Admission Policies (ValidatingAdmissionPolicy)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-in-tree-vs-webhook-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The In-Tree vs. Webhook Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-architectural-advantages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Architectural Advantages:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-the-gatekeeper-layer-has-9-constraints-not-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why the Gatekeeper layer has 9 constraints, not 3
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-kube-bench-runs-in-kube-system-not-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why kube-bench runs in kube-system, not default
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-local-path-storage-is-excluded-in-gatekeeper-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why local-path-storage is excluded in Gatekeeper constraints
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gitops-architecture-multi-application-decoupling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitOps Architecture: Multi-Application Decoupling
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#observability-security-telemetry-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observability &amp; Security Telemetry Integration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#audit-logging-scope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Audit logging scope
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#enterprise-secret-management-sopsage-vs-external-secrets-operator-eso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise Secret Management: SOPS+Age vs. External Secrets Operator (ESO)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Enterprise Secret Management: SOPS+Age vs. External Secrets Operator (ESO)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-developer-workstation-local-gitops-mozilla-sops-age" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Developer Workstation &amp; Local GitOps: Mozilla SOPS + Age
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-multi-cloud-enterprise-vault-sync-external-secrets-operator-eso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Multi-Cloud &amp; Enterprise Vault Sync: External Secrets Operator (ESO)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#networkpolicy-auto-discovery-overcoming-the-zero-trust-blackhole" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NetworkPolicy Auto-Discovery: Overcoming the Zero-Trust Blackhole
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#automated-workload-hardening-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Automated Workload Hardening Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Automated Workload Hardening Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#design-principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Design Principles:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multi-cloud-parity-architecture-aws-eks-gcp-gke" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-Cloud Parity Architecture: AWS EKS &amp; GCP GKE
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#smaller-lessons-worth-keeping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Smaller lessons worth keeping
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations & Runbooks
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Operations & Runbooks
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../operations-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../active-defense/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Active Threat Defense (Falco Talon)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Controls
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Security Controls
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../networking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zero-Trust Networking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../secrets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Secret Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../supply-chain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supply-Chain Security (SLSA 3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-Cloud Deployment
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Multi-Cloud Deployment
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/eks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AWS EKS Hardening
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/gke/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GCP GKE Hardening
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Project Governance
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Project Governance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security-policy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Policy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code-of-conduct/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Code of Conduct
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-anonymous-auth-is-not-disabled-on-the-api-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why anonymous-auth is NOT disabled on the API server
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-the-terraform-layer-shells-out-to-the-kind-cli-instead-of-using-the-tehcyxkind-provider" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why the Terraform layer shells out to the kind CLI instead of using the tehcyx/kind provider
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-default-deny-calico-on-kind" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why default-deny + Calico on kind
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-two-enforcement-layers-psa-gatekeeper" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why two enforcement layers (PSA + Gatekeeper)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-rbac-ships-a-workload-runtime-role-instead-of-relying-only-on-defaults" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why RBAC ships a workload-runtime Role instead of relying only on defaults
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-the-webhook-is-fail-open-ignore-not-fail-closed-fail-corrected" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why the webhook is fail-open (Ignore), not fail-closed (Fail) — corrected
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compensating-control-native-in-tree-cel-admission-policies-validatingadmissionpolicy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compensating Control: Native In-Tree CEL Admission Policies (ValidatingAdmissionPolicy)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Compensating Control: Native In-Tree CEL Admission Policies (ValidatingAdmissionPolicy)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-in-tree-vs-webhook-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The In-Tree vs. Webhook Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-architectural-advantages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Architectural Advantages:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-the-gatekeeper-layer-has-9-constraints-not-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why the Gatekeeper layer has 9 constraints, not 3
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-kube-bench-runs-in-kube-system-not-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why kube-bench runs in kube-system, not default
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-local-path-storage-is-excluded-in-gatekeeper-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why local-path-storage is excluded in Gatekeeper constraints
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gitops-architecture-multi-application-decoupling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitOps Architecture: Multi-Application Decoupling
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#observability-security-telemetry-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observability &amp; Security Telemetry Integration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#audit-logging-scope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Audit logging scope
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#enterprise-secret-management-sopsage-vs-external-secrets-operator-eso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise Secret Management: SOPS+Age vs. External Secrets Operator (ESO)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Enterprise Secret Management: SOPS+Age vs. External Secrets Operator (ESO)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-developer-workstation-local-gitops-mozilla-sops-age" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Developer Workstation &amp; Local GitOps: Mozilla SOPS + Age
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-multi-cloud-enterprise-vault-sync-external-secrets-operator-eso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Multi-Cloud &amp; Enterprise Vault Sync: External Secrets Operator (ESO)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#networkpolicy-auto-discovery-overcoming-the-zero-trust-blackhole" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NetworkPolicy Auto-Discovery: Overcoming the Zero-Trust Blackhole
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#automated-workload-hardening-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Automated Workload Hardening Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Automated Workload Hardening Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#design-principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Design Principles:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multi-cloud-parity-architecture-aws-eks-gcp-gke" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-Cloud Parity Architecture: AWS EKS &amp; GCP GKE
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#smaller-lessons-worth-keeping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Smaller lessons worth keeping
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="architecture-notes">Architecture notes<a class="headerlink" href="#architecture-notes" title="Permanent link">&para;</a></h1>
+<h2 id="why-anonymous-auth-is-not-disabled-on-the-api-server">Why <code>anonymous-auth</code> is NOT disabled on the API server<a class="headerlink" href="#why-anonymous-auth-is-not-disabled-on-the-api-server" title="Permanent link">&para;</a></h2>
+<p>CIS control 1.2.1 recommends <code>--anonymous-auth=false</code>. We tried exactly that, and it breaks cluster bootstrap entirely: <code>kubeadm join</code>'s default discovery mechanism reads the <code>cluster-info</code> ConfigMap in <code>kube-public</code> <strong>unauthenticated</strong> — by design, since a joining node has no credentials yet. Disabling anonymous auth makes that read return <code>401 Unauthorized</code>, and every worker join hangs indefinitely retrying against a wall the cluster itself put up.</p>
+<p>This is a genuine, known tension between that CIS control and kubeadm's token-based bootstrap flow, not a misconfiguration on our end. The realistic fixes are: (a) leave anonymous-auth enabled, as we do here, and rely on RBAC + NodeRestriction to constrain what an anonymous/unauthenticated request can actually see or do; or (b) switch to <strong>file-based discovery</strong> (baking a static bootstrap kubeconfig into worker nodes ahead of time) instead of token discovery, which doesn't need the anonymous ConfigMap read at all. We chose (a) for this project since it keeps <code>make deploy</code> a true one-command flow — (b) would need per-node kubeconfig provisioning as an extra step. If you need <code>anonymous-auth=false</code> for a compliance requirement, implement (b) and update this doc.</p>
+<h2 id="why-the-terraform-layer-shells-out-to-the-kind-cli-instead-of-using-the-tehcyxkind-provider">Why the Terraform layer shells out to the <code>kind</code> CLI instead of using the <code>tehcyx/kind</code> provider<a class="headerlink" href="#why-the-terraform-layer-shells-out-to-the-kind-cli-instead-of-using-the-tehcyxkind-provider" title="Permanent link">&para;</a></h2>
+<p>We started with the <code>tehcyx/kind</code> Terraform provider's native <code>kind_config</code> resource block. In practice it repeatedly failed to complete multi-node worker joins when combined with custom <code>kubeadm_config_patches</code> — the underlying <code>kind create cluster</code> process would run, but visibility into <em>why</em> it stalled was opaque (Terraform just shows "Still creating..." with no intermediate output). Switching <code>main.tf</code> to a <code>null_resource</code> + <code>local-exec</code> that calls <code>kind create cluster --config kind-config.yaml</code> directly gives the exact same real-time output you'd get running <code>kind</code> by hand — which is what let us find the <code>anonymous-auth</code> issue above in the first place. The trade-off is losing Terraform's native resource semantics (typed attributes, <code>terraform plan</code> diffing on cluster properties); for a project whose value is the security config layered on top, not the provisioning mechanism itself, that trade-off was worth it.</p>
+<h2 id="why-default-deny-calico-on-kind">Why default-deny + Calico on kind<a class="headerlink" href="#why-default-deny-calico-on-kind" title="Permanent link">&para;</a></h2>
+<p>kindnet (kind's default CNI) does not enforce <code>NetworkPolicy</code> — it provides pod networking only. Without swapping in a policy-aware CNI, the <code>default-deny-all</code> NetworkPolicy in <code>kustomize/base/network-policies/</code> would be silently ignored and the cluster would <em>look</em> zero-trust without <em>being</em> zero-trust. <code>terraform/kind/main.tf</code> disables the default CNI and installs Calico for this reason.</p>
+<h2 id="why-two-enforcement-layers-psa-gatekeeper">Why two enforcement layers (PSA + Gatekeeper)<a class="headerlink" href="#why-two-enforcement-layers-psa-gatekeeper" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Pod Security Admission (PSA)</strong>, applied via namespace labels, is built into Kubernetes core, has zero extra moving parts, and enforces the standard "restricted" profile.</li>
+<li><strong>OPA Gatekeeper</strong> adds enforcement Kubernetes' native PSA can't express as precisely (e.g. exact rego conditions, custom messages, audit trail of violations over time, extensibility for future org-specific rules).</li>
+</ul>
+<p>Together: PSA is the floor that can never regress even if Gatekeeper is ever uninstalled; Gatekeeper is the layer that gives auditable, extensible policy-as-code.</p>
+<h2 id="why-rbac-ships-a-workload-runtime-role-instead-of-relying-only-on-defaults">Why RBAC ships a <code>workload-runtime</code> Role instead of relying only on defaults<a class="headerlink" href="#why-rbac-ships-a-workload-runtime-role-instead-of-relying-only-on-defaults" title="Permanent link">&para;</a></h2>
+<p>Kubernetes ships no default namespaced role suitable for application workloads — teams either bind <code>cluster-admin</code> (too broad) or write nothing (pods run with only their ServiceAccount's implicit, minimal permissions, which usually breaks introspection features). <code>workload-runtime</code> is the least-privilege middle ground: read-only access to configmaps and pod listing, explicitly <em>no</em> secrets access. Secrets access is intentionally left to a separate, per-secret scoped role so it's an explicit decision, not a default.</p>
+<h2 id="why-the-webhook-is-fail-open-ignore-not-fail-closed-fail-corrected">Why the webhook is fail-open (<code>Ignore</code>), not fail-closed (<code>Fail</code>) — corrected<a class="headerlink" href="#why-the-webhook-is-fail-open-ignore-not-fail-closed-fail-corrected" title="Permanent link">&para;</a></h2>
+<p>We initially set <code>validatingWebhookFailurePolicy: Fail</code> (see the now-outdated reasoning below) but hit a real, reproducible deadlock on kind+Calico: Calico's IP address management uses <strong>cluster-scoped</strong> CRDs (<code>IPAMBlock</code>, <code>BlockAffinity</code>) that have no namespace at all. Gatekeeper's own <code>gatekeeper-system</code> exclusion works by namespace label/name — which simply cannot apply to a resource that has no namespace. The result: every pod's IP allocation, in every namespace, calls Gatekeeper's webhook regardless of the exclusion. If that webhook is ever unreachable — including during Gatekeeper's <em>own</em> first install, before its pods have networking yet — no pod anywhere can start, which means Gatekeeper's own pods can never come up to start serving the webhook again. A genuine, unrecoverable deadlock, not a timing fluke.</p>
+<p>Switching to <code>Ignore</code> breaks that deadlock: if the webhook is down, requests proceed unvalidated rather than hanging forever. The real cost is a brief enforcement gap any time the webhook pod restarts (e.g. after a node reboot, before Kubernetes reschedules it) — worth knowing if you're relying on this for a real security boundary, not just a demo/portfolio cluster. If you need genuinely fail-closed behavior, the correct fix is upstream: exclude Gatekeeper's own namespace from Calico's admission-relevant object creation entirely (a Calico/Gatekeeper compatibility concern, not something this project's config can fully solve on its own).</p>
+<h2 id="compensating-control-native-in-tree-cel-admission-policies-validatingadmissionpolicy">Compensating Control: Native In-Tree CEL Admission Policies (<code>ValidatingAdmissionPolicy</code>)<a class="headerlink" href="#compensating-control-native-in-tree-cel-admission-policies-validatingadmissionpolicy" title="Permanent link">&para;</a></h2>
+<p>To eliminate the brief enforcement gap caused by Gatekeeper's fail-open webhook and eliminate external webhook latency (50–200ms per admission request), SecureKube introduces <strong>Kubernetes 1.30+ in-tree CEL ValidatingAdmissionPolicies</strong> in <code>kustomize/base/vap/</code>.</p>
+<h3 id="the-in-tree-vs-webhook-architecture">The In-Tree vs. Webhook Architecture<a class="headerlink" href="#the-in-tree-vs-webhook-architecture" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Incoming Request -&gt; [ kube-apiserver ]
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                         |
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>                         +---&gt; 1. In-Tree CEL Evaluation (Sub-millisecond, In-Process)
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>                         |        [vap-no-privileged, vap-no-root, vap-readonly-rootfs, etc.]
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>                         |        (Rejects immediately if non-compliant; ZERO network roundtrips)
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>                         |
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>                         +---&gt; 2. External Webhook Evaluation (Out-of-Process over HTTPS)
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>                                  [Gatekeeper Webhook Service]
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>                                  (Deep Rego inspection, Cosign signatures, violation auditing)
+</span></code></pre></div>
+<h3 id="key-architectural-advantages">Key Architectural Advantages:<a class="headerlink" href="#key-architectural-advantages" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Zero External Network Hops</strong>: Evaluated in-memory inside <code>kube-apiserver</code>, slashing admission latency from &gt;100ms down to microseconds.</li>
+<li><strong>Zero Webhook Deadlock Risk</strong>: Because CEL policies execute in-process, they never deadlock against CNI IPAM CRDs or webhook pod cold-starts.</li>
+<li><strong>Dual-Layer Defense</strong>: CEL acts as an instantaneous in-tree filter for core security constraints, while Gatekeeper provides extensible Rego policies, comprehensive audit logging (<code>gatekeeper_violations</code>), and Cosign signature verification.</li>
+</ol>
+<hr />
+<h2 id="why-the-gatekeeper-layer-has-9-constraints-not-3">Why the Gatekeeper layer has 9 constraints, not 3<a class="headerlink" href="#why-the-gatekeeper-layer-has-9-constraints-not-3" title="Permanent link">&para;</a></h2>
+<p>The first pass only blocked root/privileged/writable-rootfs — a real attacker doesn't need any of those if <code>hostPath</code> mounting <code>/</code> is left open, or if a pod can set <code>hostNetwork: true</code> and see every other pod's traffic on the node. The current set closes the highest-value gaps beyond what PSA's "restricted" profile alone covers:</p>
+<table>
+<thead>
+<tr>
+<th>Constraint</th>
+<th>What it stops</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>no-root</code> / <code>no-privileged</code> / <code>readonly-rootfs</code></td>
+<td>container escape via root or writable host-equivalent access</td>
+</tr>
+<tr>
+<td><code>no-hostpath</code></td>
+<td>reading/writing the node filesystem directly</td>
+</tr>
+<tr>
+<td><code>no-host-namespaces</code></td>
+<td>seeing/signaling every process on the node, or sniffing node network traffic</td>
+</tr>
+<tr>
+<td><code>require-resources</code></td>
+<td>noisy-neighbor DoS from unbounded pods</td>
+</tr>
+<tr>
+<td><code>allowed-repos</code></td>
+<td>pulling arbitrary/untrusted images</td>
+</tr>
+<tr>
+<td><code>capabilities-and-ports</code></td>
+<td>capability creep and binding privileged ports like a root process</td>
+</tr>
+<tr>
+<td><code>require-signed-images</code></td>
+<td>untrusted supply-chain deployments lacking Cosign cryptographic signatures</td>
+</tr>
+</tbody>
+</table>
+<p>This provides comprehensive admission hardening — combined with per-workload egress NetworkPolicies and Falco eBPF runtime observability.</p>
+<h2 id="why-kube-bench-runs-in-kube-system-not-default">Why <code>kube-bench</code> runs in <code>kube-system</code>, not <code>default</code><a class="headerlink" href="#why-kube-bench-runs-in-kube-system-not-default" title="Permanent link">&para;</a></h2>
+<p>The first version of this Makefile applied <code>kube-bench</code>'s job manifest without specifying a namespace, so it landed in <code>default</code> — which has <code>pod-security.kubernetes.io/enforce: restricted</code> from <code>kustomize/base/pod-security/psa-labels.yaml</code>. <code>kube-bench</code> needs <code>hostPID: true</code> and several <code>hostPath</code> volume mounts (it inspects node-level config files like <code>/etc/kubernetes</code>, <code>/var/lib/kubelet</code>, <code>/var/lib/etcd</code>) to do its job at all — every one of those is exactly what the <code>restricted</code> profile blocks. The result: the <code>Job</code> object gets created fine (Jobs aren't subject to Pod Security Admission, only the Pods they spawn are), but every Pod the Job tries to create gets silently rejected, so the Job never has a running Pod and <code>kubectl wait --for=condition=complete</code> times out waiting for something that can never happen. Our own hardening was — correctly — blocking the tool whose entire purpose is to check that hardening.</p>
+<p>Fix: run <code>kube-bench</code> in <code>kube-system</code> instead, which we deliberately left unlabeled (no PSA, and already excluded from every Gatekeeper constraint's <code>excludedNamespaces</code>) precisely because cluster-level system tooling legitimately needs broader access than application workloads. This is the same reasoning that already applies to Calico and Gatekeeper's own pods — <code>kube-bench</code> just needed the same treatment and we'd missed it.</p>
+<h2 id="why-local-path-storage-is-excluded-in-gatekeeper-constraints">Why <code>local-path-storage</code> is excluded in Gatekeeper constraints<a class="headerlink" href="#why-local-path-storage-is-excluded-in-gatekeeper-constraints" title="Permanent link">&para;</a></h2>
+<p>Kind clusters rely on Rancher's <code>local-path-provisioner</code> to dynamically provision local PersistentVolumes. When a PVC is created (e.g. for Prometheus, Grafana, or Alertmanager), the provisioner spins up a transient <code>helper-pod</code> in the <code>local-path-storage</code> namespace. This helper pod mounts the node's <code>/var/local-path-provisioner</code> directory via <code>hostPath</code> to initialize storage paths, and runs as a minimal utility without explicit resource requests.</p>
+<p>If <code>local-path-storage</code> is not explicitly added to <code>excludedNamespaces</code> on Gatekeeper constraints, <code>block-hostpath</code> and <code>require-resources</code> will reject the helper pod on admission. The PVC remains stuck in <code>Pending</code> indefinitely with event logs citing admission rejection. Adding <code>local-path-storage</code> ensures local volume provisioning functions smoothly while keeping all user and workload namespaces strictly enforced.</p>
+<h2 id="gitops-architecture-multi-application-decoupling">GitOps Architecture: Multi-Application Decoupling<a class="headerlink" href="#gitops-architecture-multi-application-decoupling" title="Permanent link">&para;</a></h2>
+<p>Argo CD manages each layer of SecureKube as a distinct <code>Application</code> object under an <code>AppProject</code> (<code>gitops/apps/project.yaml</code>):</p>
+<ol>
+<li><strong>Infrastructure Controllers</strong>: <code>calico-system-app</code>, <code>gatekeeper-system-app</code>, <code>falco-system-app</code>.</li>
+<li><strong>Cluster Policies</strong>: <code>gatekeeper-templates-app</code>, <code>gatekeeper-constraints-app</code>, <code>network-policies-app</code>, <code>pod-security-app</code>, <code>rbac-app</code>.</li>
+<li><strong>Workload Reference</strong>: <code>secure-app</code>.</li>
+</ol>
+<p>To prevent resource ownership conflicts and duplicate drift calculations in Argo CD, each policy layer is maintained in its own self-contained directory with an independent <code>kustomization.yaml</code> (e.g., <code>kustomize/base/network-policies/</code>, <code>kustomize/base/pod-security/</code>, <code>kustomize/base/rbac/</code>). Pointing multiple Argo CD applications at the same directory is strictly avoided.</p>
+<h2 id="observability-security-telemetry-integration">Observability &amp; Security Telemetry Integration<a class="headerlink" href="#observability-security-telemetry-integration" title="Permanent link">&para;</a></h2>
+<p>Security without observability creates an operational blind spot. SecureKube combines runtime kernel telemetry with admission audit metrics:</p>
+<ul>
+<li><strong>Falco eBPF Probes</strong>: Inspect system calls (execve, open, connect) on worker and control-plane nodes. Alerts are emitted in JSON to standard out and forwarded over HTTP to <code>falco-sidekick</code> and Redis.</li>
+<li><strong>Falco Sidekick UI</strong>: Visualizes runtime threat frequency, priority classifications (<code>Warning</code>, <code>Error</code>, <code>Critical</code>), and offending container metadata at <code>localhost:2802</code>.</li>
+<li><strong>Prometheus &amp; Grafana (<code>kube-prometheus-stack</code>)</strong>: Scrapes Gatekeeper metrics (<code>gatekeeper_violations</code>, <code>gatekeeper_constraints</code>), cAdvisor, and node-exporter metrics. Pre-provisioned dashboards in <code>observability/dashboards/</code> offer immediate situational awareness of cluster compliance and resource health.</li>
+</ul>
+<h2 id="audit-logging-scope">Audit logging scope<a class="headerlink" href="#audit-logging-scope" title="Permanent link">&para;</a></h2>
+<p><code>terraform/kind/audit-policy.yaml</code> logs full request/response bodies only for <code>secrets</code>, <code>configmaps</code>, and RBAC objects — the resources where a full body matters for a security investigation — and only request metadata for everything else, to keep log volume manageable while still satisfying CIS 3.2.x.</p>
+<h2 id="enterprise-secret-management-sopsage-vs-external-secrets-operator-eso">Enterprise Secret Management: SOPS+Age vs. External Secrets Operator (ESO)<a class="headerlink" href="#enterprise-secret-management-sopsage-vs-external-secrets-operator-eso" title="Permanent link">&para;</a></h2>
+<p>SecureKube provides two complementary, production-grade secrets patterns tailored to different operational environments:</p>
+<h3 id="1-developer-workstation-local-gitops-mozilla-sops-age">1. Developer Workstation &amp; Local GitOps: Mozilla SOPS + Age<a class="headerlink" href="#1-developer-workstation-local-gitops-mozilla-sops-age" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Use Case</strong>: Local development, CI/CD pipelines, and standalone GitOps repositories without enterprise vault infrastructure.</li>
+<li><strong>Mechanism</strong>: The repository contains <code>.sops.yaml</code> with public Age recipient keys. Secret manifests are encrypted client-side (<code>make secrets-encrypt</code>). Sensitive payload data is encrypted via AES-256-GCM while metadata remains intact for Git versioning. Decryption happens on-the-fly (<code>make secrets-apply</code>) or in-cluster via the KSOPS plugin.</li>
+</ul>
+<h3 id="2-multi-cloud-enterprise-vault-sync-external-secrets-operator-eso">2. Multi-Cloud &amp; Enterprise Vault Sync: External Secrets Operator (ESO)<a class="headerlink" href="#2-multi-cloud-enterprise-vault-sync-external-secrets-operator-eso" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Use Case</strong>: Enterprise production clusters where developers should never handle encryption keys or decrypt raw secrets on their laptops.</li>
+<li><strong>Mechanism</strong>: ESO runs in-cluster (<code>helm/external-secrets-values.yaml</code>) with a hardened, non-root pod specification. A <code>ClusterSecretStore</code> connects directly to upstream secret providers:</li>
+<li><strong>Local/CI</strong>: <code>fake</code> provider with zero external dependencies and zero cloud billing.</li>
+<li><strong>AWS</strong>: AWS Secrets Manager authenticated via IAM Roles for Service Accounts (IRSA).</li>
+<li><strong>GCP</strong>: GCP Secret Manager authenticated via Workload Identity.</li>
+<li><strong>On-Premise / Multi-Cloud</strong>: HashiCorp Vault authenticated via Kubernetes ServiceAccount tokens.</li>
+<li><strong>Dynamic Rotation</strong>: ESO polls upstream vaults at configured intervals (e.g., <code>refreshInterval: 1h</code>) and automatically synchronizes Kubernetes <code>Secret</code> objects, decoupling secret lifecycle from Git commits.</li>
+</ul>
+<hr />
+<h2 id="networkpolicy-auto-discovery-overcoming-the-zero-trust-blackhole">NetworkPolicy Auto-Discovery: Overcoming the Zero-Trust Blackhole<a class="headerlink" href="#networkpolicy-auto-discovery-overcoming-the-zero-trust-blackhole" title="Permanent link">&para;</a></h2>
+<p>Default-deny networking is the gold standard of zero-trust Kubernetes security, but it often frustrates developers: when a pod is blocked by a NetworkPolicy, packets drop silently without error messages. Applications fail with cryptic <code>i/o timeout</code> or <code>Connection refused</code> errors.</p>
+<p>To solve this operational friction, SecureKube implements a two-fold solution:
+1. <strong>Calico Dropped Packet Observability</strong>: Calico Felix Prometheus metrics are exported on port 9091, enabling real-time monitoring of dropped packet counters in Prometheus and Grafana.
+2. <strong>Automated Discovery &amp; Generator (<code>scripts/generate-network-policy.sh</code>)</strong>: Rather than guessing egress rules, developers run <code>make generate-network-policy POD=&lt;name&gt;</code>. The generator:
+   - Queries live container specs and runtime ports.
+   - Extracts existing pod labels for targeted <code>podSelector</code> matching.
+   - Automatically injects mandatory CoreDNS egress (UDP/TCP port 53 to <code>kube-dns</code>).
+   - Produces a minimal, least-privilege <code>NetworkPolicy</code> ready for immediate application or commit into GitOps.</p>
+<hr />
+<h2 id="automated-workload-hardening-architecture">Automated Workload Hardening Architecture<a class="headerlink" href="#automated-workload-hardening-architecture" title="Permanent link">&para;</a></h2>
+<p>Rather than rejecting non-compliant manifests at admission and forcing developers through frustrating trial-and-error cycles, SecureKube provides an automated manifest transformer (<code>scripts/harden-manifest.py</code>).</p>
+<h3 id="design-principles">Design Principles:<a class="headerlink" href="#design-principles" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Preserve Developer Intent</strong>: Uses PyYAML to load manifests as structured trees, mutating only the necessary fields while preserving custom labels, annotations, volume mounts, and container arguments.</li>
+<li><strong>Complete AST Injection</strong>: Automatically injects all 12 required securityContext fields:</li>
+<li>Pod: <code>runAsNonRoot: true</code>, <code>runAsUser: 10001</code>, <code>runAsGroup: 10001</code>, <code>fsGroup: 10001</code>, <code>seccompProfile: RuntimeDefault</code>.</li>
+<li>Container: <code>allowPrivilegeEscalation: false</code>, <code>readOnlyRootFilesystem: true</code>, <code>capabilities.drop: ["ALL"]</code>.</li>
+<li>Resources: sensible default requests (<code>cpu: 50m</code>, <code>memory: 64Mi</code>) and limits (<code>cpu: 200m</code>, <code>memory: 128Mi</code>).</li>
+<li><strong>Privileged Port Remapping</strong>: Identifies reserved ports (&lt; 1024) like 80 or 443 and remaps them to unprivileged equivalents (8080, 8443) to prevent <code>CAP_NET_BIND_SERVICE</code> privilege escalation.</li>
+<li><strong>Scratch Space Emulation</strong>: Automatically attaches an in-memory <code>emptyDir</code> volume at <code>/tmp</code> so read-only root filesystems don't break applications requiring temporary write space.</li>
+</ul>
+<hr />
+<h2 id="multi-cloud-parity-architecture-aws-eks-gcp-gke">Multi-Cloud Parity Architecture: AWS EKS &amp; GCP GKE<a class="headerlink" href="#multi-cloud-parity-architecture-aws-eks-gcp-gke" title="Permanent link">&para;</a></h2>
+<p>To ensure that security controls verified locally on Kind translate seamlessly to enterprise production environments, SecureKube provides production-hardened Terraform modules for AWS and GCP:</p>
+<table>
+<thead>
+<tr>
+<th>Architectural Component</th>
+<th>Local Kind Stack</th>
+<th>AWS EKS (<code>terraform/eks/</code>)</th>
+<th>GCP GKE (<code>terraform/gke/</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Cluster Provisioning</strong></td>
+<td>Kind CLI via Terraform</td>
+<td>AWS EKS Managed Cluster</td>
+<td>GKE Private Cluster</td>
+</tr>
+<tr>
+<td><strong>Control Plane Audit</strong></td>
+<td><code>audit-policy.yaml</code> mounted</td>
+<td>CloudWatch CIS Control Plane Logs</td>
+<td>Cloud Logging CIS Audit Export</td>
+</tr>
+<tr>
+<td><strong>Secret Encryption</strong></td>
+<td>Kind etcd / SOPS / ESO</td>
+<td>AWS KMS Customer Managed Key</td>
+<td>Cloud KMS Envelope Encryption</td>
+</tr>
+<tr>
+<td><strong>Network Fabric</strong></td>
+<td>Calico CNI + NetworkPolicy</td>
+<td>AWS VPC CNI + NetworkPolicy</td>
+<td>Datapath V2 (Cilium eBPF)</td>
+</tr>
+<tr>
+<td><strong>Node Hardening</strong></td>
+<td>Docker container node</td>
+<td>IMDSv2 Enforced (<code>http_tokens</code>)</td>
+<td>Shielded GKE Nodes (Secure Boot)</td>
+</tr>
+<tr>
+<td><strong>Identity &amp; IAM</strong></td>
+<td>ServiceAccount Tokens</td>
+<td>IAM Roles for Service Accounts (IRSA)</td>
+<td>Workload Identity Federation</td>
+</tr>
+<tr>
+<td><strong>Policy Enforcement</strong></td>
+<td>Gatekeeper + In-Tree CEL</td>
+<td>Gatekeeper + In-Tree CEL</td>
+<td>Gatekeeper + In-Tree CEL</td>
+</tr>
+<tr>
+<td><strong>Runtime Detection</strong></td>
+<td>Falco modern eBPF</td>
+<td>Falco modern eBPF</td>
+<td>Falco modern eBPF</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="smaller-lessons-worth-keeping">Smaller lessons worth keeping<a class="headerlink" href="#smaller-lessons-worth-keeping" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong><code>helm/falco-values.yaml</code> uses <code>driver.kind: modern_ebpf</code>, not <code>ebpf</code>.</strong> Falco's chart renamed this value; the old name now fails install outright with a clear error, so this is a one-line fix if you ever see it again on a chart upgrade.</li>
+<li><strong>If a YAML file ever fails <code>kubectl apply</code> with a generic, low-information error</strong> (<code>invalid object to validate</code>, <code>json: cannot unmarshal string into Go value of type unstructured.detector</code>) even though the same content parses fine with a YAML linter, suspect file corruption from copy/paste or a transfer step, not a real schema issue — rewriting the file cleanly is often faster than debugging the parser.</li>
+<li><strong><code>kubectl</code>'s local schema cache (<code>~/.kube/cache</code>) can go stale</strong> right after installing a new CRD (e.g. Gatekeeper's <code>ConstraintTemplate</code>). If <code>kubectl apply</code> rejects a resource that looks structurally correct, <code>rm -rf ~/.kube/cache</code> before assuming the YAML itself is wrong.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "navigation.tracking", "search.suggest", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.a5f9d56c.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,2593 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Enterprise-Grade, CIS-Hardened Kubernetes Security Blueprint">
+      
+      
+        <meta name="author" content="Kadhiravan E G">
+      
+      
+        <link rel="canonical" href="https://kadhiravaneg.github.io/secure-kube/operations-guide/">
+      
+      
+        <link rel="prev" href="../architecture/">
+      
+      
+        <link rel="next" href="../active-defense/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
+    
+    
+      
+        <title>Operations Guide - SecureKube</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="cyan">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#securekube-operations-day-2-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="SecureKube" class="md-header__button md-logo" aria-label="SecureKube" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SecureKube
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Operations Guide
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="cyan"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="cyan"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/KADHIRAVANEG/secure-kube" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    KADHIRAVANEG/secure-kube
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href=".." class="md-tabs__link">
+          
+  
+  
+  Overview
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  Operations & Runbooks
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../networking/" class="md-tabs__link">
+          
+  
+  
+  Security Controls
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../cloud/eks/" class="md-tabs__link">
+          
+  
+  
+  Multi-Cloud Deployment
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../contributing/" class="md-tabs__link">
+          
+  
+  
+  Project Governance
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="SecureKube" class="md-nav__button md-logo" aria-label="SecureKube" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    SecureKube
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/KADHIRAVANEG/secure-kube" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    KADHIRAVANEG/secure-kube
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Overview
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture & 7 Defense Layers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations & Runbooks
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Operations & Runbooks
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations Guide
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-cluster-lifecycle-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Cluster Lifecycle Management
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Cluster Lifecycle Management">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#essential-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Essential Commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-accessing-web-dashboards-credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Accessing Web Dashboards &amp; Credentials
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Accessing Web Dashboards &amp; Credentials">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#retrieving-admin-credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Retrieving Admin Credentials
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-gitops-workflows-with-argo-cd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. GitOps Workflows with Argo CD
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. GitOps Workflows with Argo CD">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#syncing-layers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Syncing Layers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#checking-drift" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Checking Drift
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-authoring-compliant-workloads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Authoring Compliant Workloads
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Authoring Compliant Workloads">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#workload-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workload Checklist:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference-compliant-pod" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reference Compliant Pod
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-runtime-security-falco-threat-hunting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Runtime Security &amp; Falco Threat Hunting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Runtime Security &amp; Falco Threat Hunting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#live-threat-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Live Threat Monitoring
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#simulating-a-runtime-security-violation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Simulating a Runtime Security Violation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-common-troubleshooting-runbooks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Common Troubleshooting Runbooks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Common Troubleshooting Runbooks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-pvcs-stuck-in-pending" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. PVCs Stuck in Pending
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-node-in-notready-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Node in NotReady State
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-webhook-connection-reset-on-local-port-forward" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Webhook Connection Reset on Local Port-Forward
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-gitops-secrets-management-sops-age" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. GitOps Secrets Management (SOPS + Age)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. GitOps Secrets Management (SOPS + Age)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How It Works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#secrets-lifecycle-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Secrets Lifecycle Operations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference-pod-consuming-decrypted-secret" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reference Pod Consuming Decrypted Secret
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-automated-security-assault-defense-simulator-make-attack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Automated Security Assault &amp; Defense Simulator (make attack)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Automated Security Assault &amp; Defense Simulator (make attack)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-the-assault-suite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running the Assault Suite
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#attack-vectors-mitigating-defense-layers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Attack Vectors &amp; Mitigating Defense Layers
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-automated-workload-hardening-make-harden" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Automated Workload Hardening (make harden)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Automated Workload Hardening (make harden)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-it-remediates-automatically" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What It Remediates Automatically
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-native-in-tree-cel-admission-policies-validatingadmissionpolicy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Native In-Tree CEL Admission Policies (ValidatingAdmissionPolicy)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. Native In-Tree CEL Admission Policies (ValidatingAdmissionPolicy)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#deploying-testing-cel-policies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deploying &amp; Testing CEL Policies
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-networkpolicy-auto-discovery-generator-make-generate-network-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. NetworkPolicy Auto-Discovery / Generator (make generate-network-policy)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="11. NetworkPolicy Auto-Discovery / Generator (make generate-network-policy)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#usage_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generated-policy-properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generated Policy Properties
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-external-secrets-operator-local-fake-vault-enterprise-sync" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. External Secrets Operator (Local Fake Vault &amp; Enterprise Sync)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="12. External Secrets Operator (Local Fake Vault &amp; Enterprise Sync)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deployment-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deployment &amp; Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-production-cloud-provisioning-aws-eks-gcp-gke" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Production Cloud Provisioning (AWS EKS &amp; GCP GKE)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="13. Production Cloud Provisioning (AWS EKS &amp; GCP GKE)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aws-eks-terraformeks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AWS EKS (terraform/eks/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gcp-gke-terraformgke" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GCP GKE (terraform/gke/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../active-defense/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Active Threat Defense (Falco Talon)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Controls
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Security Controls
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../networking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zero-Trust Networking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../secrets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Secret Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../supply-chain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supply-Chain Security (SLSA 3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-Cloud Deployment
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Multi-Cloud Deployment
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/eks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AWS EKS Hardening
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud/gke/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GCP GKE Hardening
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Project Governance
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Project Governance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security-policy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Policy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code-of-conduct/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Code of Conduct
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-cluster-lifecycle-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Cluster Lifecycle Management
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Cluster Lifecycle Management">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#essential-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Essential Commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-accessing-web-dashboards-credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Accessing Web Dashboards &amp; Credentials
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Accessing Web Dashboards &amp; Credentials">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#retrieving-admin-credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Retrieving Admin Credentials
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-gitops-workflows-with-argo-cd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. GitOps Workflows with Argo CD
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. GitOps Workflows with Argo CD">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#syncing-layers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Syncing Layers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#checking-drift" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Checking Drift
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-authoring-compliant-workloads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Authoring Compliant Workloads
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Authoring Compliant Workloads">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#workload-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workload Checklist:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference-compliant-pod" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reference Compliant Pod
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-runtime-security-falco-threat-hunting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Runtime Security &amp; Falco Threat Hunting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Runtime Security &amp; Falco Threat Hunting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#live-threat-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Live Threat Monitoring
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#simulating-a-runtime-security-violation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Simulating a Runtime Security Violation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-common-troubleshooting-runbooks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Common Troubleshooting Runbooks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Common Troubleshooting Runbooks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-pvcs-stuck-in-pending" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. PVCs Stuck in Pending
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-node-in-notready-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Node in NotReady State
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-webhook-connection-reset-on-local-port-forward" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Webhook Connection Reset on Local Port-Forward
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-gitops-secrets-management-sops-age" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. GitOps Secrets Management (SOPS + Age)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. GitOps Secrets Management (SOPS + Age)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How It Works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#secrets-lifecycle-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Secrets Lifecycle Operations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference-pod-consuming-decrypted-secret" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reference Pod Consuming Decrypted Secret
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-automated-security-assault-defense-simulator-make-attack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Automated Security Assault &amp; Defense Simulator (make attack)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Automated Security Assault &amp; Defense Simulator (make attack)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-the-assault-suite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running the Assault Suite
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#attack-vectors-mitigating-defense-layers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Attack Vectors &amp; Mitigating Defense Layers
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-automated-workload-hardening-make-harden" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Automated Workload Hardening (make harden)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Automated Workload Hardening (make harden)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-it-remediates-automatically" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What It Remediates Automatically
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-native-in-tree-cel-admission-policies-validatingadmissionpolicy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Native In-Tree CEL Admission Policies (ValidatingAdmissionPolicy)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. Native In-Tree CEL Admission Policies (ValidatingAdmissionPolicy)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#deploying-testing-cel-policies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deploying &amp; Testing CEL Policies
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-networkpolicy-auto-discovery-generator-make-generate-network-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. NetworkPolicy Auto-Discovery / Generator (make generate-network-policy)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="11. NetworkPolicy Auto-Discovery / Generator (make generate-network-policy)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#usage_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generated-policy-properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generated Policy Properties
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-external-secrets-operator-local-fake-vault-enterprise-sync" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. External Secrets Operator (Local Fake Vault &amp; Enterprise Sync)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="12. External Secrets Operator (Local Fake Vault &amp; Enterprise Sync)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deployment-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deployment &amp; Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-production-cloud-provisioning-aws-eks-gcp-gke" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Production Cloud Provisioning (AWS EKS &amp; GCP GKE)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="13. Production Cloud Provisioning (AWS EKS &amp; GCP GKE)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aws-eks-terraformeks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AWS EKS (terraform/eks/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gcp-gke-terraformgke" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GCP GKE (terraform/gke/)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="securekube-operations-day-2-guide">SecureKube Operations &amp; Day-2 Guide<a class="headerlink" href="#securekube-operations-day-2-guide" title="Permanent link">&para;</a></h1>
+<p>A practical operational guide for deploying, managing, inspecting, and troubleshooting the SecureKube platform.</p>
+<hr />
+<h2 id="1-cluster-lifecycle-management">1. Cluster Lifecycle Management<a class="headerlink" href="#1-cluster-lifecycle-management" title="Permanent link">&para;</a></h2>
+<p>SecureKube orchestrates cluster deployment using Terraform and Make. All underlying operations run locally inside Docker via Kind.</p>
+<h3 id="essential-commands">Essential Commands<a class="headerlink" href="#essential-commands" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Action</th>
+<th>Expected Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>make deploy</code></td>
+<td>End-to-end bootstrap (Cluster -&gt; Policies -&gt; Gatekeeper -&gt; Falco -&gt; Argo CD -&gt; Test)</td>
+<td>Fully configured 3-node cluster</td>
+</tr>
+<tr>
+<td><code>make status</code></td>
+<td>Health check across nodes, Calico, Gatekeeper, Falco, Argo CD, and test workloads</td>
+<td>Status summary table</td>
+</tr>
+<tr>
+<td><code>make lint</code></td>
+<td>Runs static analysis (ShellCheck on scripts, Terraform fmt, YAML validation)</td>
+<td>Zero lint errors</td>
+</tr>
+<tr>
+<td><code>make test-offline</code></td>
+<td>Runs Gatekeeper policy validation offline via <code>gator</code> CLI (no cluster required)</td>
+<td>All constraints validated</td>
+</tr>
+<tr>
+<td><code>make test</code></td>
+<td>Runs positive &amp; negative admission control tests via <code>scripts/test-policies.sh</code></td>
+<td>8 rejected, 1 allowed</td>
+</tr>
+<tr>
+<td><code>make attack</code></td>
+<td>Runs 8-vector offensive security assault simulation</td>
+<td>100% defense score</td>
+</tr>
+<tr>
+<td><code>make harden FILE=...</code></td>
+<td>Automatically fixes insecure manifests to pass all security policies</td>
+<td>100% compliant manifest</td>
+</tr>
+<tr>
+<td><code>make generate-network-policy</code></td>
+<td>Auto-discovers pod connections and generates minimal NetworkPolicy</td>
+<td>Least-privilege policy</td>
+</tr>
+<tr>
+<td><code>make vap</code></td>
+<td>Deploys native Kubernetes in-tree CEL ValidatingAdmissionPolicies</td>
+<td>Sub-ms admission enforcement</td>
+</tr>
+<tr>
+<td><code>make secrets-eso</code></td>
+<td>Deploys External Secrets Operator &amp; syncs secrets from remote vaults</td>
+<td>Vault secrets materialized</td>
+</tr>
+<tr>
+<td><code>make cloud-eks</code> / <code>cloud-gke</code></td>
+<td>Provisions hardened AWS EKS or GCP GKE clusters via Terraform</td>
+<td>Production cloud cluster</td>
+</tr>
+<tr>
+<td><code>make bench</code></td>
+<td>Runs CIS Kubernetes Benchmark via <code>kube-bench</code> in <code>kube-system</code></td>
+<td>CIS compliance report</td>
+</tr>
+<tr>
+<td><code>make destroy</code></td>
+<td>Tears down the Kind cluster and purges local state</td>
+<td>Clean host state</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="2-accessing-web-dashboards-credentials">2. Accessing Web Dashboards &amp; Credentials<a class="headerlink" href="#2-accessing-web-dashboards-credentials" title="Permanent link">&para;</a></h2>
+<p>SecureKube includes multiple web user interfaces for GitOps, runtime security, and cluster observability:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>+------------------------------------------------------------------------------------+
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>|  Dashboard          | Port   | Command                  | Default Credentials      |
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>+------------------------------------------------------------------------------------+
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>|  Argo CD GitOps     | 8080   | make dashboard-argocd    | admin / (dynamic secret) |
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>|  Grafana Telemetry  | 3000   | make dashboard-grafana   | admin / (dynamic secret) |
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>|  Falco Sidekick UI  | 2802   | make dashboard           | Anonymous (local only)   |
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>|  Prometheus Server  | 9090   | make dashboard-prometheus| None (unauthenticated)   |
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>+------------------------------------------------------------------------------------+
+</span></code></pre></div>
+<h3 id="retrieving-admin-credentials">Retrieving Admin Credentials<a class="headerlink" href="#retrieving-admin-credentials" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Argo CD Admin Password:</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>kubectl<span class="w"> </span>-n<span class="w"> </span>argocd<span class="w"> </span>get<span class="w"> </span>secret<span class="w"> </span>argocd-initial-admin-secret<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s2">"{.data.password}"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="w"> </span>-d<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">echo</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Grafana Admin Password:</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>kubectl<span class="w"> </span>-n<span class="w"> </span>monitoring<span class="w"> </span>get<span class="w"> </span>secret<span class="w"> </span>kube-prometheus-stack-grafana<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">'{.data.admin-password}'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="w"> </span>-d<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">echo</span>
+</span></code></pre></div>
+<hr />
+<h2 id="3-gitops-workflows-with-argo-cd">3. GitOps Workflows with Argo CD<a class="headerlink" href="#3-gitops-workflows-with-argo-cd" title="Permanent link">&para;</a></h2>
+<p>All policies, controllers, and example workloads are declarative Argo CD Applications defined in <code>gitops/apps/</code>:</p>
+<h3 id="syncing-layers">Syncing Layers<a class="headerlink" href="#syncing-layers" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>make<span class="w"> </span>sync-all<span class="w">          </span><span class="c1"># Trigger manual reconciliation for all 8 applications</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>make<span class="w"> </span>sync-policies<span class="w">     </span><span class="c1"># Sync NetworkPolicies only</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>make<span class="w"> </span>sync-rbac<span class="w">         </span><span class="c1"># Sync workload RBAC only</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>make<span class="w"> </span>sync-gatekeeper<span class="w">   </span><span class="c1"># Sync Gatekeeper ConstraintTemplates and Constraints</span>
+</span></code></pre></div>
+<h3 id="checking-drift">Checking Drift<a class="headerlink" href="#checking-drift" title="Permanent link">&para;</a></h3>
+<p>When a developer or operator performs an ad-hoc <code>kubectl edit</code> or <code>kubectl apply</code> outside Git, Argo CD marks the application as <code>OutOfSync</code>. You can inspect the exact diff in the Argo CD web console at <code>http://localhost:8080</code> or via CLI:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>argocd<span class="w"> </span>app<span class="w"> </span>diff<span class="w"> </span>network-policies-app<span class="w"> </span>--insecure
+</span></code></pre></div>
+<hr />
+<h2 id="4-authoring-compliant-workloads">4. Authoring Compliant Workloads<a class="headerlink" href="#4-authoring-compliant-workloads" title="Permanent link">&para;</a></h2>
+<p>To deploy an application successfully onto SecureKube, the pod manifest must adhere to <strong>Pod Security Standards (<code>restricted</code>)</strong> and all <strong>9 OPA Gatekeeper constraints</strong>:</p>
+<h3 id="workload-checklist">Workload Checklist:<a class="headerlink" href="#workload-checklist" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[x] Run as a non-root user (<code>runAsNonRoot: true</code>, <code>runAsUser: 10001</code>)</li>
+<li>[x] Disallow privilege escalation (<code>allowPrivilegeEscalation: false</code>)</li>
+<li>[x] Drop all capabilities except explicitly permitted (<code>drop: ["ALL"]</code>)</li>
+<li>[x] Mount root filesystem read-only (<code>readOnlyRootFilesystem: true</code>)</li>
+<li>[x] Set explicit CPU and Memory requests and limits</li>
+<li>[x] Use seccomp profile <code>RuntimeDefault</code></li>
+<li>[x] Pull images only from approved registries (<code>docker.io/library/</code>, <code>ghcr.io/</code>, <code>gcr.io/</code>, <code>registry.k8s.io/</code>)</li>
+<li>[x] Never use <code>hostPath</code>, <code>hostNetwork</code>, <code>hostPID</code>, or <code>hostIPC</code></li>
+<li>[x] Bind only to non-privileged ports (&gt; 1024)</li>
+</ul>
+<h3 id="reference-compliant-pod">Reference Compliant Pod<a class="headerlink" href="#reference-compliant-pod" title="Permanent link">&para;</a></h3>
+<p>See <a href="../examples/secure-app.yaml"><code>examples/secure-app.yaml</code></a> for a fully annotated production-grade template:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Pod</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nt">metadata</span><span class="p">:</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-secure-app</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="nt">labels</span><span class="p">:</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-secure-app</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="nt">spec</span><span class="p">:</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span><span class="nt">securityContext</span><span class="p">:</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="nt">runAsNonRoot</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">    </span><span class="nt">runAsUser</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10001</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">    </span><span class="nt">runAsGroup</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10001</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">    </span><span class="nt">fsGroup</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10001</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">    </span><span class="nt">seccompProfile</span><span class="p">:</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">RuntimeDefault</span>
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">  </span><span class="nt">containers</span><span class="p">:</span>
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app</span>
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="w">      </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker.io/library/nginx:alpine</span>
+</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="w">      </span><span class="nt">securityContext</span><span class="p">:</span>
+</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="w">        </span><span class="nt">allowPrivilegeEscalation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="w">        </span><span class="nt">readOnlyRootFilesystem</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="w">        </span><span class="nt">capabilities</span><span class="p">:</span>
+</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="w">          </span><span class="nt">drop</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"ALL"</span><span class="p p-Indicator">]</span>
+</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="w">      </span><span class="nt">resources</span><span class="p">:</span>
+</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a><span class="w">        </span><span class="nt">limits</span><span class="p">:</span>
+</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="w">          </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="s">"200m"</span>
+</span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="w">          </span><span class="nt">memory</span><span class="p">:</span><span class="w"> </span><span class="s">"128Mi"</span>
+</span><span id="__span-4-28"><a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a><span class="w">        </span><span class="nt">requests</span><span class="p">:</span>
+</span><span id="__span-4-29"><a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a><span class="w">          </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="s">"50m"</span>
+</span><span id="__span-4-30"><a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a><span class="w">          </span><span class="nt">memory</span><span class="p">:</span><span class="w"> </span><span class="s">"64Mi"</span>
+</span></code></pre></div>
+<hr />
+<h2 id="5-runtime-security-falco-threat-hunting">5. Runtime Security &amp; Falco Threat Hunting<a class="headerlink" href="#5-runtime-security-falco-threat-hunting" title="Permanent link">&para;</a></h2>
+<p>Falco observes kernel events across all nodes using the modern eBPF driver.</p>
+<h3 id="live-threat-monitoring">Live Threat Monitoring<a class="headerlink" href="#live-threat-monitoring" title="Permanent link">&para;</a></h3>
+<p>Tail live alerts stream:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>make<span class="w"> </span>logs
+</span></code></pre></div></p>
+<h3 id="simulating-a-runtime-security-violation">Simulating a Runtime Security Violation<a class="headerlink" href="#simulating-a-runtime-security-violation" title="Permanent link">&para;</a></h3>
+<p>To test that Falco accurately detects unauthorized behavior in a container:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># 1. Spawn a compliant test container</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>kubectl<span class="w"> </span>run<span class="w"> </span>test-sec<span class="w"> </span>--image<span class="o">=</span>busybox:1.36<span class="w"> </span>--restart<span class="o">=</span>Never<span class="w"> </span>--command<span class="w"> </span>--<span class="w"> </span>sleep<span class="w"> </span><span class="m">3600</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># 2. Exec a terminal shell inside the container (Falco rule: "Terminal shell in container")</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>test-sec<span class="w"> </span>--<span class="w"> </span>sh<span class="w"> </span>-c<span class="w"> </span><span class="s2">"cat /etc/shadow"</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="c1"># 3. Check Falco alerts:</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>make<span class="w"> </span>logs<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">"Terminal shell"</span>
+</span></code></pre></div>
+<p>The event will immediately reflect on the <strong>Falco Sidekick UI</strong> at <code>http://localhost:2802</code> categorized as <code>Notice</code> or <code>Warning</code>.</p>
+<hr />
+<h2 id="6-common-troubleshooting-runbooks">6. Common Troubleshooting Runbooks<a class="headerlink" href="#6-common-troubleshooting-runbooks" title="Permanent link">&para;</a></h2>
+<h3 id="1-pvcs-stuck-in-pending">1. PVCs Stuck in <code>Pending</code><a class="headerlink" href="#1-pvcs-stuck-in-pending" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Symptom</strong>: <code>kubectl get pvc -A</code> shows PVCs in <code>Pending</code> state.</li>
+<li><strong>Cause</strong>: Kind's <code>local-path-provisioner</code> helper pod was rejected by admission webhooks.</li>
+<li><strong>Remediation</strong>: Ensure <code>local-path-storage</code> is present in <code>excludedNamespaces</code> in all files in <code>gatekeeper/constraints/</code>.</li>
+</ul>
+<h3 id="2-node-in-notready-state">2. Node in <code>NotReady</code> State<a class="headerlink" href="#2-node-in-notready-state" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Symptom</strong>: Nodes remain in <code>NotReady</code> after <code>make cluster</code>.</li>
+<li><strong>Cause</strong>: SecureKube disables default <code>kindnet</code> to enforce Calico. The node remains <code>NotReady</code> until a CNI provides network routing.</li>
+<li><strong>Remediation</strong>: Run <code>make policies</code> or <code>kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.0/manifests/calico.yaml</code>.</li>
+</ul>
+<h3 id="3-webhook-connection-reset-on-local-port-forward">3. Webhook Connection Reset on Local Port-Forward<a class="headerlink" href="#3-webhook-connection-reset-on-local-port-forward" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Symptom</strong>: <code>kubectl port-forward</code> exits with <code>connection reset by peer</code>.</li>
+<li><strong>Cause</strong>: Argo CD runs HTTP on port 8080 (<code>--insecure</code>), but service port 443 routes to the same container port.</li>
+<li><strong>Remediation</strong>: Forward port 80 to 8080 or pod port 8080 directly:
+  <div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>kubectl<span class="w"> </span>-n<span class="w"> </span>argocd<span class="w"> </span>port-forward<span class="w"> </span>svc/argocd-server<span class="w"> </span><span class="m">8080</span>:80<span class="w"> </span>--address<span class="w"> </span><span class="m">127</span>.0.0.1
+</span></code></pre></div></li>
+</ul>
+<hr />
+<h2 id="7-gitops-secrets-management-sops-age">7. GitOps Secrets Management (SOPS + Age)<a class="headerlink" href="#7-gitops-secrets-management-sops-age" title="Permanent link">&para;</a></h2>
+<p>Storing raw secrets in Git repositories is a critical vulnerability. SecureKube implements zero-trust GitOps secrets management using <strong>Mozilla SOPS</strong> and modern <strong>Age asymmetric encryption</strong>.</p>
+<h3 id="how-it-works">How It Works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Local Key Generation</strong>: A private/public Age keypair is generated locally (<code>~/.config/sops/age/keys.txt</code>).</li>
+<li><strong>Public Key Configuration</strong>: The public recipient is committed to <a href="../.sops.yaml"><code>.sops.yaml</code></a> targeting <code>.*\.enc\.ya?ml$</code>.</li>
+<li><strong>Encrypted in Git</strong>: Kubernetes Secret manifests (e.g., <a href="../gitops/secrets/database-credentials.enc.yaml"><code>gitops/secrets/database-credentials.enc.yaml</code></a>) are committed fully encrypted. Only keys and metadata remain plaintext; sensitive payload values are AES-256-GCM encrypted.</li>
+<li><strong>On-the-Fly Application</strong>: Manifests are decrypted in-memory during application without writing plaintext to disk.</li>
+</ol>
+<h3 id="secrets-lifecycle-operations">Secrets Lifecycle Operations<a class="headerlink" href="#secrets-lifecycle-operations" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># 1. Initialize Age keypair &amp; configure .sops.yaml</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>make<span class="w"> </span>secrets-init
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># 2. Encrypt an existing plaintext Secret manifest</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>make<span class="w"> </span>secrets-encrypt<span class="w"> </span><span class="nv">FILE</span><span class="o">=</span>my-secret.yaml<span class="w"> </span><span class="nv">DEST</span><span class="o">=</span>gitops/secrets/my-secret.enc.yaml
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="c1"># 3. Decrypt and apply encrypted secrets directly to the live cluster</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>make<span class="w"> </span>secrets-apply
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="c1"># 4. Sync Age private key to Argo CD namespace (for GitOps KSOPS plugin)</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>./scripts/secrets-tool.sh<span class="w"> </span>sync-key
+</span></code></pre></div>
+<h3 id="reference-pod-consuming-decrypted-secret">Reference Pod Consuming Decrypted Secret<a class="headerlink" href="#reference-pod-consuming-decrypted-secret" title="Permanent link">&para;</a></h3>
+<p>See <a href="../examples/secure-app-with-secret.yaml"><code>examples/secure-app-with-secret.yaml</code></a> for a hardened, admitted workload consuming database credentials via environment variables:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>examples/secure-app-with-secret.yaml
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>kubectl<span class="w"> </span>logs<span class="w"> </span>-n<span class="w"> </span>default<span class="w"> </span>pod/secure-app-with-secret
+</span></code></pre></div>
+<hr />
+<h2 id="8-automated-security-assault-defense-simulator-make-attack">8. Automated Security Assault &amp; Defense Simulator (<code>make attack</code>)<a class="headerlink" href="#8-automated-security-assault-defense-simulator-make-attack" title="Permanent link">&para;</a></h2>
+<p>SecureKube provides an integrated offensive attack simulation suite (<a href="../scripts/simulate-attacks.sh"><code>scripts/simulate-attacks.sh</code></a>) to empirically verify that every defense layer actively repels real-world cyber threats.</p>
+<h3 id="running-the-assault-suite">Running the Assault Suite<a class="headerlink" href="#running-the-assault-suite" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>make<span class="w"> </span>attack
+</span></code></pre></div>
+<h3 id="attack-vectors-mitigating-defense-layers">Attack Vectors &amp; Mitigating Defense Layers<a class="headerlink" href="#attack-vectors-mitigating-defense-layers" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Attack Vector</th>
+<th>Technique / Payload</th>
+<th>Mitigating Layer</th>
+<th>Outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1</strong></td>
+<td><strong>Privilege Escalation</strong></td>
+<td>Pod with <code>privileged: true</code>, <code>CAP_SYS_ADMIN</code></td>
+<td>Kubernetes PSA (<code>restricted</code>)</td>
+<td><strong>BLOCKED AT ADMISSION</strong></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><strong>Host Escape</strong></td>
+<td>Pod mounting <code>/</code> via <code>hostPath</code></td>
+<td>Kubernetes PSA (<code>restricted</code>)</td>
+<td><strong>BLOCKED AT ADMISSION</strong></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td><strong>Network Sniffing</strong></td>
+<td>Pod with <code>hostNetwork: true</code> eavesdropping on node</td>
+<td>Kubernetes PSA (<code>restricted</code>)</td>
+<td><strong>BLOCKED AT ADMISSION</strong></td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td><strong>Supply Chain Poisoning</strong></td>
+<td>Image pulled from untrusted external rogue registry</td>
+<td>OPA Gatekeeper (<code>[allowed-repos]</code>)</td>
+<td><strong>BLOCKED AT ADMISSION</strong></td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td><strong>Privileged Port Hijack</strong></td>
+<td>Non-root container attempting to bind port <code>80</code></td>
+<td>OPA Gatekeeper (<code>[capabilities-and-ports]</code>)</td>
+<td><strong>BLOCKED AT ADMISSION</strong></td>
+</tr>
+<tr>
+<td><strong>6</strong></td>
+<td><strong>Denial of Service</strong></td>
+<td>Unbounded memory pod without requests or limits</td>
+<td>OPA Gatekeeper (<code>[require-resources]</code>)</td>
+<td><strong>BLOCKED AT ADMISSION</strong></td>
+</tr>
+<tr>
+<td><strong>7</strong></td>
+<td><strong>Lateral Pivoting</strong></td>
+<td>Cross-namespace TCP probing to unauthorized internal DB</td>
+<td>Calico CNI + Default-Deny NetworkPolicy</td>
+<td><strong>DROPPED BY NETWORK POLICY</strong></td>
+</tr>
+<tr>
+<td><strong>8</strong></td>
+<td><strong>Runtime Exploitation</strong></td>
+<td>Spawning interactive terminal shells inside container</td>
+<td>Falco modern eBPF driver</td>
+<td><strong>DETECTED IN KERNEL TELEMETRY</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The assault suite outputs a definitive defense score (100% resilience) and is suitable for CI/CD gates and red/blue team validation.</p>
+<hr />
+<h2 id="9-automated-workload-hardening-make-harden">9. Automated Workload Hardening (<code>make harden</code>)<a class="headerlink" href="#9-automated-workload-hardening-make-harden" title="Permanent link">&para;</a></h2>
+<p>Developers often struggle with the 12+ required securityContext and resource fields required by Gatekeeper and Pod Security Standards. SecureKube includes <a href="../scripts/harden-manifest.py"><code>scripts/harden-manifest.py</code></a>, an automated AST-based manifest transformer:</p>
+<h3 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># Preview hardened manifest in stdout</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>make<span class="w"> </span>harden<span class="w"> </span><span class="nv">FILE</span><span class="o">=</span>my-insecure-pod.yaml
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="c1"># Overwrite in-place</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>make<span class="w"> </span>harden<span class="w"> </span><span class="nv">FILE</span><span class="o">=</span>my-insecure-pod.yaml<span class="w"> </span><span class="nv">IN_PLACE</span><span class="o">=</span><span class="nb">true</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="c1"># Output to a specific file</span>
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>make<span class="w"> </span>harden<span class="w"> </span><span class="nv">FILE</span><span class="o">=</span>my-insecure-pod.yaml<span class="w"> </span><span class="nv">OUTPUT</span><span class="o">=</span>my-hardened-pod.yaml
+</span></code></pre></div>
+<h3 id="what-it-remediates-automatically">What It Remediates Automatically<a class="headerlink" href="#what-it-remediates-automatically" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Injects Pod-level <code>runAsNonRoot: true</code>, <code>runAsUser: 10001</code>, <code>runAsGroup: 10001</code>, <code>fsGroup: 10001</code>, and <code>seccompProfile.type: RuntimeDefault</code>.</li>
+<li>Injects Container-level <code>allowPrivilegeEscalation: false</code>, <code>readOnlyRootFilesystem: true</code>, and <code>capabilities.drop: ["ALL"]</code>.</li>
+<li>Injects sensible default resource limits and requests (<code>cpu: 200m/50m</code>, <code>memory: 128Mi/64Mi</code>).</li>
+<li>Rewrites privileged container ports (e.g. <code>80</code> -&gt; <code>8080</code>, <code>443</code> -&gt; <code>8443</code>) to prevent host port hijacking.</li>
+<li>Adds an <code>emptyDir</code> scratch volume (<code>/tmp</code>) for read-only root filesystems requiring temp write space.</li>
+</ul>
+<hr />
+<h2 id="10-native-in-tree-cel-admission-policies-validatingadmissionpolicy">10. Native In-Tree CEL Admission Policies (<code>ValidatingAdmissionPolicy</code>)<a class="headerlink" href="#10-native-in-tree-cel-admission-policies-validatingadmissionpolicy" title="Permanent link">&para;</a></h2>
+<p>Starting in Kubernetes 1.30, admission control can be executed in-process inside <code>kube-apiserver</code> using Common Expression Language (CEL), bypassing webhook latencies (50–200ms) and avoiding webhook failure deadlocks.</p>
+<p>SecureKube deploys 8 native CEL policies located in <a href="../kustomize/base/vap/"><code>kustomize/base/vap/</code></a>:
+1. <code>vap-no-privileged</code>: Prohibits <code>securityContext.privileged: true</code>.
+2. <code>vap-no-root</code>: Enforces <code>runAsNonRoot: true</code> or non-zero <code>runAsUser</code>.
+3. <code>vap-readonly-rootfs</code>: Enforces <code>readOnlyRootFilesystem: true</code>.
+4. <code>vap-no-hostpath</code>: Prohibits <code>hostPath</code> volume mounts.
+5. <code>vap-no-host-namespaces</code>: Prohibits <code>hostNetwork</code>, <code>hostPID</code>, and <code>hostIPC</code>.
+6. <code>vap-require-resources</code>: Enforces CPU and memory requests/limits.
+7. <code>vap-capabilities-and-ports</code>: Enforces <code>capabilities.drop: ["ALL"]</code> and port &gt; 1024.
+8. <code>vap-allowed-registries</code>: Restricts container image registries to approved sources.</p>
+<h3 id="deploying-testing-cel-policies">Deploying &amp; Testing CEL Policies<a class="headerlink" href="#deploying-testing-cel-policies" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Deploy CEL policies and cluster-wide bindings</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>make<span class="w"> </span>vap
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="c1"># Policies run in-tree alongside Gatekeeper and evaluate instantaneously</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>examples/insecure-apps.yaml
+</span></code></pre></div>
+<hr />
+<h2 id="11-networkpolicy-auto-discovery-generator-make-generate-network-policy">11. NetworkPolicy Auto-Discovery / Generator (<code>make generate-network-policy</code>)<a class="headerlink" href="#11-networkpolicy-auto-discovery-generator-make-generate-network-policy" title="Permanent link">&para;</a></h2>
+<p>Debugging silent packet drops in zero-trust environments can stall developer velocity. SecureKube includes <a href="../scripts/generate-network-policy.sh"><code>scripts/generate-network-policy.sh</code></a> to auto-generate minimal least-privilege egress and ingress rules.</p>
+<h3 id="usage_1">Usage<a class="headerlink" href="#usage_1" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># Discover live ports and generate NetworkPolicy for a pod</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>make<span class="w"> </span>generate-network-policy<span class="w"> </span><span class="nv">POD</span><span class="o">=</span>my-app<span class="w"> </span><span class="nv">NAMESPACE</span><span class="o">=</span>default
+</span></code></pre></div>
+<h3 id="generated-policy-properties">Generated Policy Properties<a class="headerlink" href="#generated-policy-properties" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Automatically extracts pod labels and container ports for ingress rules.</li>
+<li>Automatically includes mandatory egress to CoreDNS (<code>kube-dns</code> on UDP/TCP port 53).</li>
+<li>Implements strict default-deny for all unauthorized ingress and egress traffic.</li>
+</ul>
+<hr />
+<h2 id="12-external-secrets-operator-local-fake-vault-enterprise-sync">12. External Secrets Operator (Local Fake Vault &amp; Enterprise Sync)<a class="headerlink" href="#12-external-secrets-operator-local-fake-vault-enterprise-sync" title="Permanent link">&para;</a></h2>
+<p>For enterprise environments using HashiCorp Vault, AWS Secrets Manager, or GCP Secret Manager, SecureKube integrates the <strong>External Secrets Operator (ESO)</strong>:</p>
+<h3 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Runs with hardened non-root container specs (<code>helm/external-secrets-values.yaml</code>).</li>
+<li>Configures <code>ClusterSecretStore</code> (<a href="../gitops/secrets/eso/cluster-secret-store.yaml"><code>gitops/secrets/eso/cluster-secret-store.yaml</code></a>).</li>
+<li>Local environments use the built-in <code>fake</code> provider for zero-cost, zero-dependency testing.</li>
+<li>Includes pre-configured production blocks for Vault, AWS Secrets Manager, and GCP Secret Manager.</li>
+</ul>
+<h3 id="deployment-verification">Deployment &amp; Verification<a class="headerlink" href="#deployment-verification" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># Deploy ESO and synchronize secrets</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>make<span class="w"> </span>secrets-eso
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="c1"># Verify materialized secret</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>kubectl<span class="w"> </span>get<span class="w"> </span>secret<span class="w"> </span>database-credentials-vault<span class="w"> </span>-n<span class="w"> </span>default<span class="w"> </span>-o<span class="w"> </span>yaml
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="c1"># Run workload consuming ESO synchronized secret</span>
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>examples/secure-app-with-vault-secret.yaml
+</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>kubectl<span class="w"> </span>logs<span class="w"> </span>-n<span class="w"> </span>default<span class="w"> </span>pod/secure-app-with-vault-secret
+</span></code></pre></div>
+<hr />
+<h2 id="13-production-cloud-provisioning-aws-eks-gcp-gke">13. Production Cloud Provisioning (AWS EKS &amp; GCP GKE)<a class="headerlink" href="#13-production-cloud-provisioning-aws-eks-gcp-gke" title="Permanent link">&para;</a></h2>
+<p>SecureKube provides production-ready Terraform modules to deploy the identical zero-trust security baseline onto managed hyperscaler cloud environments:</p>
+<h3 id="aws-eks-terraformeks">AWS EKS (<code>terraform/eks/</code>)<a class="headerlink" href="#aws-eks-terraformeks" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Encrypted control plane secrets via AWS KMS.</li>
+<li>CIS control plane logging (api, audit, authenticator, controllerManager, scheduler).</li>
+<li>Private cluster endpoint with managed public CIDR allow-listing.</li>
+<li>Hardened managed node groups with IMDSv2 enforced (<code>http_tokens = "required"</code>, <code>http_put_response_hop_limit = 1</code>).</li>
+<li>IAM Roles for Service Accounts (IRSA) via OIDC provider.</li>
+<li>Automated SecureKube baseline bootstrapping via Helm provider.</li>
+</ul>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nb">cd</span><span class="w"> </span>terraform/eks
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>terraform<span class="w"> </span>init
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>terraform<span class="w"> </span>apply<span class="w"> </span>-var<span class="o">=</span><span class="s2">"cluster_name=prod-securekube"</span>
+</span></code></pre></div>
+<h3 id="gcp-gke-terraformgke">GCP GKE (<code>terraform/gke/</code>)<a class="headerlink" href="#gcp-gke-terraformgke" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Datapath V2 enabled (Cilium eBPF CNI native integration).</li>
+<li>Shielded GKE Nodes (Secure Boot &amp; Integrity Monitoring).</li>
+<li>Workload Identity enabled for zero-secret GCP API authentication.</li>
+<li>Private cluster with authorized master networks.</li>
+<li>Cloud KMS envelope encryption for Kubernetes secrets.</li>
+<li>Automated SecureKube baseline bootstrapping via Helm provider.</li>
+</ul>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nb">cd</span><span class="w"> </span>terraform/gke
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>terraform<span class="w"> </span>init
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>terraform<span class="w"> </span>apply<span class="w"> </span>-var<span class="o">=</span><span class="s2">"cluster_name=prod-securekube"</span>
+</span></code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "navigation.tracking", "search.suggest", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.a5f9d56c.min.js"></script>
+      
+    
+  </body>
+</html>
