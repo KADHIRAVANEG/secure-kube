@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="bgGrad" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#1e1b4b" />
+      <stop offset="60%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#020617" />
+    </radialGradient>
+
+    <!-- Shield Primary Gradient (Cyber Cyan to Electric Purple) -->
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f2fe" />
+      <stop offset="50%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#8b5cf6" />
+    </linearGradient>
+
+    <!-- Core Glow Gradient -->
+    <linearGradient id="coreGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#818cf8" />
+    </linearGradient>
+
+    <!-- Accent Emerald for Zero-Trust -->
+    <linearGradient id="emeraldGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+
+    <!-- Soft Glow Filter -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <filter id="shieldShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#00f2fe" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <!-- Dark Tech Canvas Background -->
+  <rect width="512" height="512" rx="96" fill="url(#bgGrad)" />
+
+  <!-- Outer Cyber Circuit Ring (Subtle) -->
+  <circle cx="256" cy="256" r="220" fill="none" stroke="#1e293b" stroke-width="2" stroke-dasharray="8 12" opacity="0.6" />
+  <circle cx="256" cy="256" r="195" fill="none" stroke="#334155" stroke-width="1.5" opacity="0.4" />
+
+  <!-- Outer Protective Aegis Shield -->
+  <path d="M 256 64 
+           L 396 114 
+           C 396 264 340 374 256 432 
+           C 172 374 116 264 116 114 
+           Z" 
+        fill="#0f172a" 
+        fill-opacity="0.85" 
+        stroke="url(#shieldGrad)" 
+        stroke-width="5" 
+        stroke-linejoin="round"
+        filter="url(#shieldShadow)" />
+
+  <!-- Inner Defense Perimeter Grid -->
+  <path d="M 256 94 
+           L 370 134 
+           C 370 256 322 348 256 398 
+           C 190 348 142 256 142 134 
+           Z" 
+        fill="none" 
+        stroke="#1e293b" 
+        stroke-width="2" 
+        stroke-dasharray="4 6" />
+
+  <!-- K8S 7-Spoke Helm Core Assembly -->
+  <!-- Center Hub Outer Ring -->
+  <circle cx="256" cy="242" r="76" fill="#0f172a" stroke="url(#coreGrad)" stroke-width="4" filter="url(#glow)" />
+  <!-- Center Hub Inner Fill -->
+  <circle cx="256" cy="242" r="48" fill="url(#bgGrad)" stroke="#38bdf8" stroke-width="2" />
+  <!-- Center Core Fortress Node -->
+  <circle cx="256" cy="242" r="24" fill="url(#emeraldGrad)" />
+  <circle cx="256" cy="242" r="12" fill="#ffffff" opacity="0.9" />
+
+  <!-- 7 Helm Spokes (Angle = 360 / 7 = 51.42857 deg) -->
+  <!-- Spoke 1: 0 deg (Up) -->
+  <g transform="translate(256, 242)">
+    <!-- Spoke 1 (Top) -->
+    <g transform="rotate(0)">
+      <line x1="0" y1="-48" x2="0" y2="-108" stroke="url(#shieldGrad)" stroke-width="7" stroke-linecap="round" />
+      <circle cx="0" cy="-114" r="11" fill="#00f2fe" filter="url(#glow)" />
+      <circle cx="0" cy="-114" r="5" fill="#ffffff" />
+    </g>
+    <!-- Spoke 2 (51.43 deg) -->
+    <g transform="rotate(51.43)">
+      <line x1="0" y1="-48" x2="0" y2="-108" stroke="url(#shieldGrad)" stroke-width="7" stroke-linecap="round" />
+      <circle cx="0" cy="-114" r="11" fill="#38bdf8" filter="url(#glow)" />
+      <circle cx="0" cy="-114" r="5" fill="#ffffff" />
+    </g>
+    <!-- Spoke 3 (102.86 deg) -->
+    <g transform="rotate(102.86)">
+      <line x1="0" y1="-48" x2="0" y2="-108" stroke="url(#shieldGrad)" stroke-width="7" stroke-linecap="round" />
+      <circle cx="0" cy="-114" r="11" fill="#818cf8" filter="url(#glow)" />
+      <circle cx="0" cy="-114" r="5" fill="#ffffff" />
+    </g>
+    <!-- Spoke 4 (154.29 deg) -->
+    <g transform="rotate(154.29)">
+      <line x1="0" y1="-48" x2="0" y2="-108" stroke="url(#shieldGrad)" stroke-width="7" stroke-linecap="round" />
+      <circle cx="0" cy="-114" r="11" fill="#a78bfa" filter="url(#glow)" />
+      <circle cx="0" cy="-114" r="5" fill="#ffffff" />
+    </g>
+    <!-- Spoke 5 (205.71 deg) -->
+    <g transform="rotate(205.71)">
+      <line x1="0" y1="-48" x2="0" y2="-108" stroke="url(#shieldGrad)" stroke-width="7" stroke-linecap="round" />
+      <circle cx="0" cy="-114" r="11" fill="#a78bfa" filter="url(#glow)" />
+      <circle cx="0" cy="-114" r="5" fill="#ffffff" />
+    </g>
+    <!-- Spoke 6 (257.14 deg) -->
+    <g transform="rotate(257.14)">
+      <line x1="0" y1="-48" x2="0" y2="-108" stroke="url(#shieldGrad)" stroke-width="7" stroke-linecap="round" />
+      <circle cx="0" cy="-114" r="11" fill="#818cf8" filter="url(#glow)" />
+      <circle cx="0" cy="-114" r="5" fill="#ffffff" />
+    </g>
+    <!-- Spoke 7 (308.57 deg) -->
+    <g transform="rotate(308.57)">
+      <line x1="0" y1="-48" x2="0" y2="-108" stroke="url(#shieldGrad)" stroke-width="7" stroke-linecap="round" />
+      <circle cx="0" cy="-114" r="11" fill="#38bdf8" filter="url(#glow)" />
+      <circle cx="0" cy="-114" r="5" fill="#ffffff" />
+    </g>
+  </g>
+
+  <!-- Outer Wheel Rim Ring connecting the 7 Spokes -->
+  <circle cx="256" cy="242" r="108" fill="none" stroke="url(#shieldGrad)" stroke-width="3" stroke-dasharray="14 12" opacity="0.8" />
+
+  <!-- Security Checkmark / Fortress Badge Accent at Shield Base -->
+  <path d="M 232 402 L 250 420 L 282 388" fill="none" stroke="#10b981" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" />
+</svg>
