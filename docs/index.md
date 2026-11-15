@@ -1,6 +1,10 @@
 # SecureKube
 
 <p align="center">
+  <img src="assets/securekube-banner.jpg" alt="SecureKube Banner" width="100%">
+</p>
+
+<p align="center">
   <strong>Enterprise-Grade, CIS-Hardened, Zero-Trust Kubernetes Security Blueprint</strong><br>
   <em>100% Local Development • Zero Cloud Cost • Fully Automated Defense</em>
 </p>

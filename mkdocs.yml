@@ -9,6 +9,8 @@ edit_uri: edit/main/docs/
 theme:
   name: material
   language: en
+  logo: assets/securekube-logo.svg
+  favicon: assets/securekube-logo.svg
   features:
     - navigation.tabs
     - navigation.sections
