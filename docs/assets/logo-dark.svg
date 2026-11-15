@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <!-- Hard Black Offset Shadow for Box -->
-  <rect x="24" y="24" width="464" height="464" rx="36" fill="#000000" />
+  <rect x="24" y="24" width="464" height="464" rx="36" fill="#18181B" />
   <!-- Cream Base Canvas with 6px Black Border -->
-  <rect x="16" y="16" width="464" height="464" rx="36" fill="#FDFBF7" stroke="#000000" stroke-width="6" />
+  <rect x="16" y="16" width="464" height="464" rx="36" fill="#FAF6EE" stroke="#18181B" stroke-width="6" />
 
   <!-- Shield Hard Offset Black Shadow -->
   <path d="M 264 68 
@@ -10,7 +10,7 @@
            C 412 278 356 384 264 438 
            C 172 384 116 278 116 118 
            Z" 
-        fill="#000000" />
+        fill="#18181B" />
 
   <!-- Shield Body: Cobalt Blue with 6px Black Stroke -->
   <path d="M 256 60 
@@ -19,46 +19,46 @@
            C 164 376 108 270 108 110 
            Z" 
         fill="#2563EB" 
-        stroke="#000000" 
+        stroke="#18181B" 
         stroke-width="6" 
         stroke-linejoin="round" />
 
   <!-- Inner Helm Wheel: Cream Fill with 6px Black Border -->
-  <circle cx="256" cy="238" r="82" fill="#FDFBF7" stroke="#000000" stroke-width="7" />
+  <circle cx="256" cy="238" r="82" fill="#FAF6EE" stroke="#18181B" stroke-width="7" />
 
   <!-- 7 Radial Spokes -->
-    <line x1="256.0" y1="200.0" x2="256.0" y2="126.0" stroke="#000000" stroke-width="8" stroke-linecap="round" />
-    <line x1="285.7" y1="214.3" x2="343.6" y2="168.2" stroke="#000000" stroke-width="8" stroke-linecap="round" />
-    <line x1="293.0" y1="246.5" x2="365.2" y2="262.9" stroke="#000000" stroke-width="8" stroke-linecap="round" />
-    <line x1="272.5" y1="272.2" x2="304.6" y2="338.9" stroke="#000000" stroke-width="8" stroke-linecap="round" />
-    <line x1="239.5" y1="272.2" x2="207.4" y2="338.9" stroke="#000000" stroke-width="8" stroke-linecap="round" />
-    <line x1="219.0" y1="246.5" x2="146.8" y2="262.9" stroke="#000000" stroke-width="8" stroke-linecap="round" />
-    <line x1="226.3" y1="214.3" x2="168.4" y2="168.2" stroke="#000000" stroke-width="8" stroke-linecap="round" />
+    <line x1="256.0" y1="200.0" x2="256.0" y2="126.0" stroke="#18181B" stroke-width="8" stroke-linecap="round" />
+    <line x1="285.7" y1="214.3" x2="343.6" y2="168.2" stroke="#18181B" stroke-width="8" stroke-linecap="round" />
+    <line x1="293.0" y1="246.5" x2="365.2" y2="262.9" stroke="#18181B" stroke-width="8" stroke-linecap="round" />
+    <line x1="272.5" y1="272.2" x2="304.6" y2="338.9" stroke="#18181B" stroke-width="8" stroke-linecap="round" />
+    <line x1="239.5" y1="272.2" x2="207.4" y2="338.9" stroke="#18181B" stroke-width="8" stroke-linecap="round" />
+    <line x1="219.0" y1="246.5" x2="146.8" y2="262.9" stroke="#18181B" stroke-width="8" stroke-linecap="round" />
+    <line x1="226.3" y1="214.3" x2="168.4" y2="168.2" stroke="#18181B" stroke-width="8" stroke-linecap="round" />
 
   <!-- 7 Red Handle Nodes -->
-    <circle cx="256.0" cy="126.0" r="11" fill="#DC2626" stroke="#000000" stroke-width="4" />
-    <circle cx="343.6" cy="168.2" r="11" fill="#DC2626" stroke="#000000" stroke-width="4" />
-    <circle cx="365.2" cy="262.9" r="11" fill="#DC2626" stroke="#000000" stroke-width="4" />
-    <circle cx="304.6" cy="338.9" r="11" fill="#DC2626" stroke="#000000" stroke-width="4" />
-    <circle cx="207.4" cy="338.9" r="11" fill="#DC2626" stroke="#000000" stroke-width="4" />
-    <circle cx="146.8" cy="262.9" r="11" fill="#DC2626" stroke="#000000" stroke-width="4" />
-    <circle cx="168.4" cy="168.2" r="11" fill="#DC2626" stroke="#000000" stroke-width="4" />
+    <circle cx="256.0" cy="126.0" r="11" fill="#D9534F" stroke="#18181B" stroke-width="4" />
+    <circle cx="343.6" cy="168.2" r="11" fill="#D9534F" stroke="#18181B" stroke-width="4" />
+    <circle cx="365.2" cy="262.9" r="11" fill="#D9534F" stroke="#18181B" stroke-width="4" />
+    <circle cx="304.6" cy="338.9" r="11" fill="#D9534F" stroke="#18181B" stroke-width="4" />
+    <circle cx="207.4" cy="338.9" r="11" fill="#D9534F" stroke="#18181B" stroke-width="4" />
+    <circle cx="146.8" cy="262.9" r="11" fill="#D9534F" stroke="#18181B" stroke-width="4" />
+    <circle cx="168.4" cy="168.2" r="11" fill="#D9534F" stroke="#18181B" stroke-width="4" />
 
-  <!-- Center Hub: Red Fill with Black Stroke -->
-  <circle cx="256" cy="238" r="38" fill="#DC2626" stroke="#000000" stroke-width="5" />
+  <!-- Center Hub: Soft Red Fill with Black Stroke -->
+  <circle cx="256" cy="238" r="38" fill="#D9534F" stroke="#18181B" stroke-width="5" />
 
   <!-- Padlock Core in Cream -->
   <path d="M 245 236 V 227 C 245 221 250 216 256 216 C 262 216 267 221 267 227 V 236" 
-        fill="none" stroke="#FDFBF7" stroke-width="5" stroke-linecap="round" />
-  <rect x="238" y="235" width="36" height="26" rx="4" fill="#FDFBF7" stroke="#000000" stroke-width="3" />
-  <circle cx="256" cy="246" r="3" fill="#000000" />
-  <polygon points="254,246 258,246 259,254 253,254" fill="#000000" />
+        fill="none" stroke="#FAF6EE" stroke-width="5" stroke-linecap="round" />
+  <rect x="238" y="235" width="36" height="26" rx="4" fill="#FAF6EE" stroke="#18181B" stroke-width="3" />
+  <circle cx="256" cy="246" r="3" fill="#18181B" />
+  <polygon points="254,246 258,246 259,254 253,254" fill="#18181B" />
 
-  <!-- Bottom Stamp Tag -->
+  <!-- Bottom Stamp Tag: Soft Red with Cream Text -->
   <g transform="translate(141, 442)">
-    <rect x="4" y="4" width="230" height="38" rx="8" fill="#000000" />
-    <rect x="0" y="0" width="230" height="38" rx="8" fill="#DC2626" stroke="#000000" stroke-width="3.5" />
-    <text x="115" y="25" font-family="'JetBrains Mono', monospace" font-weight="900" font-size="15" fill="#FDFBF7" text-anchor="middle" letter-spacing="1">
+    <rect x="4" y="4" width="230" height="38" rx="8" fill="#18181B" />
+    <rect x="0" y="0" width="230" height="38" rx="8" fill="#D9534F" stroke="#18181B" stroke-width="3.5" />
+    <text x="115" y="25" font-family="'JetBrains Mono', monospace" font-weight="900" font-size="15" fill="#FAF6EE" text-anchor="middle" letter-spacing="1">
       ★ SECUREKUBE ★
     </text>
   </g>
