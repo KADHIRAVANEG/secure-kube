@@ -1,0 +1,77 @@
+site_name: SecureKube
+site_description: Enterprise-Grade, CIS-Hardened Kubernetes Security Blueprint
+site_author: Kadhiravan E G
+site_url: https://kadhiravaneg.github.io/secure-kube/
+repo_url: https://github.com/KADHIRAVANEG/secure-kube
+repo_name: KADHIRAVANEG/secure-kube
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.instant
+    - navigation.tracking
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+  palette:
+    - scheme: slate
+      primary: deep purple
+      accent: cyan
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    - scheme: default
+      primary: deep purple
+      accent: cyan
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Overview:
+      - Introduction: index.md
+      - Architecture & 7 Defense Layers: architecture.md
+  - Operations & Runbooks:
+      - Operations Guide: operations-guide.md
+      - Active Threat Defense (Falco Talon): active-defense.md
+  - Security Controls:
+      - Zero-Trust Networking: networking.md
+      - Secret Management: secrets.md
+      - Supply-Chain Security (SLSA 3): supply-chain.md
+  - Multi-Cloud Deployment:
+      - AWS EKS Hardening: cloud/eks.md
+      - GCP GKE Hardening: cloud/gke.md
+  - Project Governance:
+      - Contributing: contributing.md
+      - Security Policy: security-policy.md
+      - Code of Conduct: code-of-conduct.md
+      - Changelog: changelog.md

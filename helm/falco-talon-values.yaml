@@ -1,0 +1,114 @@
+# Falco Talon Helm Values
+# Automated threat response engine for SecureKube.
+# Intercepts Falco runtime security events and takes immediate remediation actions
+# (e.g. terminating compromised pods, isolating them with network quarantine labels).
+
+replicaCount: 1
+
+image:
+  registry: falco.docker.scarf.sh
+  repository: falcosecurity/falco-talon
+  tag: "0.3.0"
+  pullPolicy: IfNotPresent
+
+# Run as non-root to satisfy Pod Security Standards
+podSecurityContext:
+  runAsUser: 1234
+  fsGroup: 1234
+
+securityContext:
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  seccompProfile:
+    type: RuntimeDefault
+
+service:
+  type: ClusterIP
+  port: 2803
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 128Mi
+
+rbac:
+  serviceAccount:
+    create: true
+    name: falco-talon
+  namespaces: ["get", "list"]
+  pods: ["get", "update", "patch", "delete", "list"]
+  events: ["get", "update", "patch", "create"]
+  networkpolicies: ["get", "update", "patch", "create"]
+
+config:
+  listenAddress: 0.0.0.0
+  listenPort: 2803
+  watchRules: true
+  printAllEvents: false
+
+  defaultNotifiers:
+    - k8sevents
+
+  deduplication:
+    leaderElection: false
+    timeWindowSeconds: 5
+
+  rulesOverride: |
+    # Action 1: Terminate the compromised pod immediately
+    - action: Terminate Compromised Pod
+      actionner: kubernetes:terminate
+      parameters:
+        grace_period_seconds: 0
+        ignore_daemonsets: true
+        ignore_statefulsets: false
+
+    # Action 2: Apply zero-trust network quarantine label
+    - action: Quarantine Suspicious Pod
+      actionner: kubernetes:label
+      parameters:
+        labels:
+          security.securekube.io/quarantine: "true"
+
+    # Rule 1: Rogue terminal shell inside container -> Immediate pod termination
+    - rule: Terminal Shell Active Defense
+      description: "Terminate any pod where an interactive terminal shell is executed"
+      match:
+        rules:
+          - "Terminal shell in container"
+        namespaces:
+          not:
+            - kube-system
+            - falco
+            - gatekeeper-system
+            - monitoring
+            - argocd
+            - calico-system
+            - external-secrets
+      actions:
+        - Terminate Compromised Pod
+
+    # Rule 2: Credential theft or sensitive file read -> Quarantine & Terminate
+    - rule: Sensitive File Access Defense
+      description: "Terminate any pod reading sensitive credentials or host files"
+      match:
+        rules:
+          - "Read sensitive file untrusted"
+          - "Write below etc"
+        namespaces:
+          not:
+            - kube-system
+            - falco
+            - gatekeeper-system
+            - monitoring
+            - argocd
+            - calico-system
+            - external-secrets
+      actions:
+        - Quarantine Suspicious Pod
+        - Terminate Compromised Pod

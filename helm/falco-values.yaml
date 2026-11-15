@@ -13,6 +13,11 @@ falcosidekick:
       hostport: "http://kube-prometheus-stack-alertmanager.monitoring.svc.cluster.local:9093"
       minimumpriority: "warning"
       checkcert: false
+    # Push Falco alerts to Falco Talon for active threat response & pod quarantine
+    talon:
+      address: "http://falco-talon.falco.svc.cluster.local:2803"
+      minimumpriority: "notice"
+      checkcert: false
     # Expose /metrics for Prometheus to scrape
     prometheusmetrics:
       enabled: true

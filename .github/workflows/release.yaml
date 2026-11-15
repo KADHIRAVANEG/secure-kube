@@ -98,6 +98,50 @@ jobs:
             "ghcr.io/${{ steps.owner.outputs.lc }}/secure-kube@${{ steps.build.outputs.digest }}"
           echo "✅ Signature verified successfully"
 
+      - name: Install Syft (SBOM generator)
+        uses: anchore/sbom-action/download-syft@v0.17.9
+
+      - name: Generate SPDX SBOM
+        run: |
+          syft "ghcr.io/${{ steps.owner.outputs.lc }}/secure-kube@${{ steps.build.outputs.digest }}" \
+            -o spdx-json=sbom.spdx.json
+
+      - name: Attest SBOM to GHCR with Cosign (SLSA Level 3 / SPDX)
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        run: |
+          cosign attest --yes \
+            --predicate sbom.spdx.json \
+            --type spdx \
+            "ghcr.io/${{ steps.owner.outputs.lc }}/secure-kube@${{ steps.build.outputs.digest }}"
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+
+      - name: Attest SBOM to Docker Hub with Cosign (SLSA Level 3 / SPDX)
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        run: |
+          cosign attest --yes \
+            --predicate sbom.spdx.json \
+            --type spdx \
+            "${{ secrets.DOCKERHUB_USERNAME }}/secure-kube@${{ steps.build.outputs.digest }}"
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+
+      - name: Verify SBOM attestations
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        run: |
+          cosign verify-attestation \
+            --type spdx \
+            --certificate-identity-regexp="https://github.com/${{ github.repository }}/.*" \
+            --certificate-oidc-issuer="https://token.actions.githubusercontent.com" \
+            "ghcr.io/${{ steps.owner.outputs.lc }}/secure-kube@${{ steps.build.outputs.digest }}"
+          echo "✅ SBOM attestation verified successfully on GHCR"
+
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom.spdx.json
+
       - name: Scan container image for vulnerabilities (Trivy)
         uses: aquasecurity/trivy-action@master
         with:
@@ -161,9 +205,22 @@ jobs:
             echo "  --certificate-identity-regexp='https://github.com/${{ github.repository }}/.*' \\"
             echo "  --certificate-oidc-issuer='https://token.actions.githubusercontent.com' \\"
             echo "  ghcr.io/${{ steps.owner.outputs.lc }}/secure-kube:${CURRENT_TAG}"
+            echo ""
+            echo "# Verify SBOM attestation (SLSA Level 3)"
+            echo "cosign verify-attestation \\"
+            echo "  --type spdx \\"
+            echo "  --certificate-identity-regexp='https://github.com/${{ github.repository }}/.*' \\"
+            echo "  --certificate-oidc-issuer='https://token.actions.githubusercontent.com' \\"
+            echo "  ghcr.io/${{ steps.owner.outputs.lc }}/secure-kube:${CURRENT_TAG}"
             echo "\`\`\`"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
+
+      - name: Download SBOM artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sbom
+          path: .
 
       - name: Create release archive
         run: |
@@ -175,6 +232,8 @@ jobs:
         with:
           name: "SecureKube ${{ github.ref_name }}"
           body: ${{ steps.changelog.outputs.CHANGELOG }}
-          files: securekube-${{ github.ref_name }}.zip
+          files: |
+            securekube-${{ github.ref_name }}.zip
+            sbom.spdx.json
           draft: false
           prerelease: ${{ contains(github.ref_name, '-rc') || contains(github.ref_name, '-beta') || contains(github.ref_name, '-alpha') }}
