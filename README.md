@@ -3,10 +3,15 @@
 ![CI](https://github.com/KADHIRAVANEG/secure-kube/actions/workflows/ci.yaml/badge.svg)
 ![Release](https://github.com/KADHIRAVANEG/secure-kube/actions/workflows/release.yaml/badge.svg)
 ![GitHub release](https://img.shields.io/github/v/release/KADHIRAVANEG/secure-kube)
+[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue?style=flat-square&logo=materialformkdocs)](https://kadhiravaneg.github.io/secure-kube/)
+[![SLSA Level 3](https://img.shields.io/badge/SLSA-Level%203-success?style=flat-square&logo=sigstore)](https://kadhiravaneg.github.io/secure-kube/supply-chain/)
+[![Active Defense](https://img.shields.io/badge/Active%20Defense-Falco%20Talon-purple?style=flat-square)](https://kadhiravaneg.github.io/secure-kube/active-defense/)
 ![License](https://img.shields.io/github/license/KADHIRAVANEG/secure-kube)
 ![Security scan](https://img.shields.io/badge/security-trivy-blue)
 
 A CIS-aligned, zero-trust Kubernetes cluster provisioned via IaC — no manual security configuration required, 100% local, zero cloud cost.
+
+📖 **Interactive Documentation Portal**: [https://kadhiravaneg.github.io/secure-kube/](https://kadhiravaneg.github.io/secure-kube/)
 
 ## Container image
 
@@ -239,7 +244,8 @@ securekube/
 │       └── *.enc.yaml               SOPS+Age encrypted Kubernetes Secrets (safe for Git)
 ├── helm/
 │   ├── gatekeeper-values.yaml       fail-open webhook (see docs/architecture.md), 3 replicas
-│   ├── falco-values.yaml            modern_ebpf driver, JSON output, sidekick UI
+│   ├── falco-values.yaml            modern_ebpf driver, JSON output, sidekick UI, Talon webhook
+│   ├── falco-talon-values.yaml      automated threat response & zero-trust pod quarantine
 │   ├── external-secrets-values.yaml hardened non-root External Secrets Operator chart values
 │   └── kube-prometheus-stack-values.yaml tuned monitoring stack values (local Kind storage)
 ├── observability/
@@ -259,14 +265,26 @@ securekube/
 │   ├── test-policies.sh             live cluster negative + positive policy tests
 │   ├── test-offline.sh              offline Gatekeeper policy validation via gator CLI
 │   ├── simulate-attacks.sh          automated 8-vector offensive assault and defense verification
+│   ├── test-active-defense.sh       Falco + Talon active threat response & pod quarantine verification
+│   ├── verify-sbom.sh               cryptographic container signature & SLSA 3 SPDX SBOM verifier
 │   ├── secrets-tool.sh              SOPS + Age encryption, decryption, and key management
 │   ├── install-argocd.sh            automated Argo CD bootstrap and app registration
 │   └── sign-images.sh               Cosign keyless/key-pair image signing utility
 ├── docs/
+│   ├── index.md                     interactive documentation portal home
 │   ├── architecture.md              the real reasoning behind every non-obvious decision
 │   ├── operations-guide.md          day-2 runbook, dashboard access, workload guide
+│   ├── active-defense.md            eBPF Falco Talon automated response & pod quarantine guide
+│   ├── networking.md                zero-trust microsegmentation & Calico policies
+│   ├── secrets.md                   dual secret management: SOPS+Age and External Secrets Operator
+│   ├── supply-chain.md              SLSA Level 3 supply-chain integrity, Cosign & Syft SPDX SBOMs
+│   ├── cloud/                       AWS EKS and GCP GKE CIS-hardened deployment runbooks
 │   └── screenshots/                 live UI & terminal verification captures
-└── .github/workflows/ci.yaml        spins up kind, deploys, validates, tears down
+├── mkdocs.yml                       Material for MkDocs portal configuration
+└── .github/workflows/
+    ├── ci.yaml                      automated CI testing + 8-vector offensive assault gate
+    ├── release.yaml                 multi-arch build, Cosign signing, and SLSA 3 SBOM attestation
+    └── docs.yaml                    automated MkDocs documentation deployment to GitHub Pages
 ```
 
 ## Known limitations (read this before treating it as "done")
@@ -294,12 +312,15 @@ securekube/
 
 ## Documentation Index
 
+- **[Interactive Documentation Portal](https://kadhiravaneg.github.io/secure-kube/)** — Full documentation website powered by Material for MkDocs.
 - **[Architecture Deep-Dive](docs/architecture.md)** — Rationale behind security controls, trade-offs (`anonymous-auth`, fail-open webhook), and lessons learned.
 - **[Operations & Day-2 Guide](docs/operations-guide.md)** — Practical runbook for cluster access, dashboard credentials, compliant workload authoring, and troubleshooting.
-- **[Network Policies Guide](network-policies/README.md)** — Zero-trust template index and multi-tier application reference.
-- **[External Secrets Operator Guide](gitops/secrets/eso/README.md)** — Setup and provider configurations for HashiCorp Vault, AWS Secrets Manager, and GCP Secret Manager.
-- **[AWS EKS Terraform Guide](terraform/eks/README.md)** — Production AWS EKS module with KMS encryption, CIS logging, and IRSA.
-- **[GCP GKE Terraform Guide](terraform/gke/README.md)** — Production GCP GKE module with Datapath V2, Shielded Nodes, and Workload Identity.
+- **[Active Threat Defense & Pod Quarantine](docs/active-defense.md)** — Falco modern eBPF and Falco Talon automated runtime remediation.
+- **[Network Policies Guide](docs/networking.md)** — Zero-trust template index and multi-tier application reference.
+- **[Secret Management Guide](docs/secrets.md)** — Dual secret management: SOPS + Age GitOps and External Secrets Operator (Vault, AWS, GCP).
+- **[Supply-Chain & SLSA 3 Guide](docs/supply-chain.md)** — Keyless Cosign OIDC signing, Syft SPDX SBOMs, and attestation verification.
+- **[AWS EKS Terraform Guide](docs/cloud/eks.md)** — Production AWS EKS module with KMS encryption, CIS logging, and IRSA.
+- **[GCP GKE Terraform Guide](docs/cloud/gke.md)** — Production GCP GKE module with Datapath V2, Shielded Nodes, and Workload Identity.
 - **[Contributing Guide](CONTRIBUTING.md)** — Contribution workflow, commit conventions, Gatekeeper constraint checklist, and test requirements.
 - **[Security Policy](SECURITY.md)** — Vulnerability reporting protocol and documented trade-offs.
 - **[Changelog](CHANGELOG.md)** — Keep a Changelog tracking releases, features, and fixes.
@@ -325,3 +346,7 @@ securekube/
 - [x] Secrets management via External Secrets Operator (Vault, AWS Secrets Manager, GCP Secret Manager)
 - [x] Hardened AWS EKS Terraform module (KMS envelope encryption, CIS logging, IMDSv2, IRSA)
 - [x] Hardened GCP GKE Terraform module (Datapath V2 eBPF, Shielded Nodes, Workload Identity)
+- [x] Automated Offensive Assault in CI (`make attack` as a required gate in `.github/workflows/ci.yaml`)
+- [x] Active Threat Termination & Pod Quarantine via Falco Talon (`make talon`, `make test-active-defense`)
+- [x] SLSA Level 3 Supply-Chain Attestation & SPDX SBOM via Syft + Cosign (`make verify-sbom`)
+- [x] Interactive Documentation Portal via Material for MkDocs deployed to GitHub Pages (`kadhiravaneg.github.io/secure-kube`)

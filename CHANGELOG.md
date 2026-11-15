@@ -6,6 +6,16 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [Unreleased]
+
+### Added
+- **Automated Offensive Assault Gate in CI (`make attack`)**: Integrated the 8-vector security assault simulator into `.github/workflows/ci.yaml` as an automated gate. The workflow verifies that 8/8 real-world cyber attack scenarios (privilege escalation, host escapes, hostNetwork MITM, untrusted registry supply chain, privileged port hijacking, memory exhaustion DoS, Calico lateral pivoting, and Falco eBPF runtime exploitation) are actively blocked or detected with a 100% defense score, failing the build on any breach.
+- **Active Threat Termination & Zero-Trust Pod Quarantine (Falco Talon)**: Integrated [Falco Talon](https://github.com/falcosecurity/falco-talon) v0.3.0 response engine into the runtime defense layer. Wired FalcoSidekick to stream security events directly to Talon (`http://falco-talon:2803`). Configured automated `kubernetes:terminate` to immediately SIGKILL containers spawning unauthorized shells (`Terminal shell in container`) and `kubernetes:label` to quarantine suspicious pods with zero-trust isolation. Added [`helm/falco-talon-values.yaml`](helm/falco-talon-values.yaml), verification test [`scripts/test-active-defense.sh`](scripts/test-active-defense.sh), and targets `make talon` and `make test-active-defense`.
+- **SLSA Level 3 Supply-Chain Attestation & SPDX SBOM Generation**: Upgraded release pipeline to full SLSA Level 3 compliance using Anchore Syft to automatically generate an SPDX-JSON Software Bill of Materials (SBOM) for multi-arch releases. Attached the cryptographic SBOM to GHCR and Docker Hub images via Sigstore Cosign in-toto attestation (`cosign attest --predicate sbom.spdx.json --type spdx`). Added consumer verification script [`scripts/verify-sbom.sh`](scripts/verify-sbom.sh) and target `make verify-sbom`.
+- **Interactive Documentation Portal (Material for MkDocs & GitHub Pages)**: Created a full documentation website configured via [`mkdocs.yml`](mkdocs.yml) using Material for MkDocs with dark/light mode toggle, instant navigation, and search. Deployed automatically to GitHub Pages at [https://kadhiravaneg.github.io/secure-kube/](https://kadhiravaneg.github.io/secure-kube/) via [`.github/workflows/docs.yaml`](.github/workflows/docs.yaml). Added local preview targets `make docs-serve` and `make docs-build`.
+
+---
+
 ## [1.6.0] - 2026-11-14
 
 ### Added

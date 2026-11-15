@@ -247,10 +247,13 @@ echo ""
 
 # ── Attack 8: Runtime Kernel Exploitation (Falco eBPF) ─────────────────
 echo -e "${BOLD}[Attack 8/${TOTAL}] Runtime Exploit: Unauthorized shell execution inside container${NC}"
-if kubectl get pods -n falco 2>/dev/null | grep -q "Running"; then
+if kubectl wait --for=condition=Ready pods -l app.kubernetes.io/name=falco -n falco --timeout=30s >/dev/null 2>&1 || kubectl get pods -n falco 2>/dev/null | grep -q "Running"; then
   echo -e "  ${GREEN}✓ DETECTED BY RUNTIME EBPF:${NC} Falco eBPF driver active and monitoring syscalls"
   echo -e "  ${BLUE}Defense Layer:${NC} Falco Kernel eBPF Telemetry Engine"
   echo -e "  ${CYAN}Threat Mitigated:${NC} Real-time detection of terminal shells & privilege escalation"
+  if kubectl get pods -n falco -l app.kubernetes.io/name=falco-talon 2>/dev/null | grep -q "Running"; then
+    echo -e "  ${GREEN}✓ ACTIVE RESPONSE ENGINE:${NC} Falco Talon armed for automated pod termination & quarantine"
+  fi
   SCORE=$((SCORE + 1))
 else
   echo -e "  ${YELLOW}⚠ Falco pods not detected in 'falco' namespace${NC}"
@@ -268,7 +271,11 @@ PERCENT=$(( SCORE * 100 / TOTAL ))
 if [ "${SCORE}" -eq "${TOTAL}" ]; then
   echo -e "Defense Efficiency: ${GREEN}${BOLD}${PERCENT}% (MAXIMUM RESILIENCE)${NC}"
   echo -e "Status: ${GREEN}ALL 8 OFFENSIVE ATTACKS NEUTRALIZED BY SECUREKUBE HARDENING${NC}"
+  echo -e "${BOLD}${CYAN}========================================================================${NC}"
+  exit 0
 else
-  echo -e "Defense Efficiency: ${YELLOW}${BOLD}${PERCENT}%${NC}"
+  echo -e "Defense Efficiency: ${RED}${BOLD}${PERCENT}%${NC}"
+  echo -e "Status: ${RED}SECURITY DEFENSE INCOMPLETE - Some attack vectors were not neutralized${NC}"
+  echo -e "${BOLD}${CYAN}========================================================================${NC}"
+  exit 1
 fi
-echo -e "${BOLD}${CYAN}========================================================================${NC}"

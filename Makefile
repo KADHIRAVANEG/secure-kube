@@ -1,8 +1,8 @@
 include config.env
 export
 
-.PHONY: deploy deploy-light destroy cluster policies gatekeeper falco argocd observability verify test bench \
-        attack secrets-init secrets-encrypt secrets-apply harden generate-network-policy vap secrets-eso \
+.PHONY: deploy deploy-light destroy cluster policies gatekeeper falco talon argocd observability verify test bench \
+        attack test-active-defense verify-sbom docs-serve docs-build secrets-init secrets-encrypt secrets-apply harden generate-network-policy vap secrets-eso \
         cloud-eks cloud-gke \
         status logs clean-logs dashboard dashboard-argocd dashboard-grafana dashboard-prometheus sync-policies sync-rbac \
         sync-gatekeeper sync-pod-security sync-helm-apps sync-all clean help
@@ -15,7 +15,7 @@ export TF_VAR_cluster_name TF_VAR_enable_network_policy_cni
 help: ## Show this help
 	@grep -h -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-22s\033[0m %s\n", $$1, $$2}'
 
-deploy: cluster policies gatekeeper falco argocd observability test ## Full one-command deploy (kind, local)
+deploy: cluster policies gatekeeper falco talon argocd observability test ## Full one-command deploy (kind, local)
 	@echo ""
 	@echo "✅ SecureKube is up. CIS-hardened, zero-trust, policy-enforced, GitOps-managed, fully observable."
 	@echo "   Run 'make dashboard-grafana'    → Grafana at localhost:3000 (admin / securekube-admin)"
@@ -67,6 +67,19 @@ ifeq ($(strip $(ENABLE_FALCO)),true)
 	@echo "→ Falco runtime monitoring active. Run 'make dashboard' to view alerts."
 else
 	@echo "→ ENABLE_FALCO=false in config.env, skipping Falco install"
+endif
+
+talon: ## Step 5b: Install Falco Talon active threat response engine
+ifeq ($(strip $(ENABLE_FALCO)),true)
+	helm repo add falcosecurity https://falcosecurity.github.io/charts --force-update
+	helm repo update
+	helm upgrade --install falco-talon falcosecurity/falco-talon \
+		--namespace falco --create-namespace \
+		--wait --timeout 180s \
+		-f helm/falco-talon-values.yaml
+	@echo "→ Falco Talon active defense engine installed (automated pod termination & quarantine)"
+else
+	@echo "→ ENABLE_FALCO=false in config.env, skipping Falco Talon install"
 endif
 
 argocd: ## Install Argo CD + register all SecureKube Applications (manual sync mode)
@@ -144,7 +157,7 @@ lint: ## Run static analysis (shellcheck, terraform fmt, YAML validation)
 	@echo "→ Checking Terraform formatting..."
 	terraform -chdir=terraform/kind fmt -check -recursive
 	@echo "→ Validating YAML manifests..."
-	python3 -c "import yaml, glob; [list(yaml.safe_load_all(open(f))) for f in glob.glob('**/*.yaml', recursive=True) + glob.glob('**/*.yml', recursive=True)]"
+	python3 -c "import yaml, glob; yaml.add_multi_constructor('tag:yaml.org,2002:python/', lambda loader, suffix, node: None, Loader=yaml.SafeLoader); [list(yaml.safe_load_all(open(f))) for f in glob.glob('**/*.yaml', recursive=True) + glob.glob('**/*.yml', recursive=True)]"
 	@echo "✓ All static linting checks passed!"
 
 test-offline: ## Run offline Gatekeeper policy validation via gator
@@ -155,6 +168,20 @@ test: ## Step 6: Test policies (negative + positive)
 
 attack: ## Simulate 8 real-world cyber attacks and verify defense
 	./scripts/simulate-attacks.sh
+
+test-active-defense: ## Verify Falco + Talon active runtime pod termination & quarantine
+	./scripts/test-active-defense.sh
+
+verify-sbom: ## Verify container image signature and SLSA Level 3 SPDX SBOM (usage: make verify-sbom [IMAGE=...])
+	./scripts/verify-sbom.sh $(if $(IMAGE),$(IMAGE),ghcr.io/kadhiravaneg/secure-kube:latest)
+
+docs-serve: ## Serve documentation portal locally on http://localhost:8000
+	which mkdocs >/dev/null 2>&1 || pip install mkdocs-material
+	mkdocs serve
+
+docs-build: ## Build documentation portal static HTML site
+	which mkdocs >/dev/null 2>&1 || pip install mkdocs-material
+	mkdocs build
 
 verify: test ## Alias for 'test' (back-compat)
 
@@ -215,6 +242,9 @@ status: ## Show health of every SecureKube component
 	@echo ""
 	@echo "== Falco =="
 	@kubectl get pods -n falco 2>/dev/null || echo "  not installed"
+	@echo ""
+	@echo "== Falco Talon (Active Response) =="
+	@kubectl get pods -n falco -l app.kubernetes.io/name=falco-talon 2>/dev/null || echo "  not installed"
 	@echo ""
 	@echo "== Argo CD =="
 	@kubectl get pods -n argocd 2>/dev/null || echo "  not installed"

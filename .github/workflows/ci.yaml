@@ -73,6 +73,9 @@ jobs:
       - name: Test policies (negative + positive)
         run: make test
 
+      - name: Run Security Assault Simulator (8 cyber attack vectors)
+        run: make attack
+
       - name: Run CIS Benchmark (kube-bench)
         run: make bench
 
