@@ -74,7 +74,7 @@ config:
             - calico-system
             - external-secrets
       actions:
-        - Terminate Compromised Pod
+        - action: Terminate Compromised Pod
 
     # Rule 2: Credential theft or sensitive file read -> Quarantine & Terminate
     - rule: Sensitive File Access Defense
@@ -93,8 +93,8 @@ config:
             - calico-system
             - external-secrets
       actions:
-        - Quarantine Suspicious Pod
-        - Terminate Compromised Pod
+        - action: Quarantine Suspicious Pod
+        - action: Terminate Compromised Pod
 ```
 
 ---

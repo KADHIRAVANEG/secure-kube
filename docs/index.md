@@ -22,6 +22,10 @@
   <img src="https://img.shields.io/badge/eBPF-Falco%20%2B%20Talon-purple?style=flat-square" alt="Falco Talon">
 </p>
 
+<p align="center">
+  <img src="assets/demo.gif" alt="SecureKube Live Terminal & Active Defense Showcase" width="100%">
+</p>
+
 ---
 
 ## ⚡ Quickstart

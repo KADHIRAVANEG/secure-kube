@@ -22,6 +22,10 @@
   📖 <strong><a href="https://kadhiravaneg.github.io/secure-kube/">Read the Interactive Documentation Portal →</a></strong>
 </p>
 
+<p align="center">
+  <img src="docs/assets/demo.gif" alt="SecureKube Live Terminal & Active Defense Showcase" width="100%">
+</p>
+
 ## Container image
 
 >No local tool installation required — pull the image and run:
