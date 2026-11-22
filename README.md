@@ -7,14 +7,15 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/KADHIRAVANEG/secure-kube/actions/workflows/ci.yaml"><img src="https://github.com/KADHIRAVANEG/secure-kube/actions/workflows/ci.yaml/badge.svg" alt="CI"></a>
-  <a href="https://github.com/KADHIRAVANEG/secure-kube/actions/workflows/release.yaml"><img src="https://github.com/KADHIRAVANEG/secure-kube/actions/workflows/release.yaml/badge.svg" alt="Release"></a>
-  <a href="https://github.com/KADHIRAVANEG/secure-kube/releases"><img src="https://img.shields.io/github/v/release/KADHIRAVANEG/secure-kube?style=flat-square&color=blue" alt="GitHub release"></a>
+  <a href="https://github.com/KADHIRAVANEG/secure-kube/actions/workflows/ci.yaml"><img src="https://img.shields.io/github/actions/workflow/status/KADHIRAVANEG/secure-kube/ci.yaml?branch=main&label=CI&style=flat-square&logo=github" alt="CI"></a>
+  <a href="https://github.com/KADHIRAVANEG/secure-kube/releases"><img src="https://img.shields.io/github/v/release/KADHIRAVANEG/secure-kube?style=flat-square&color=blue&logo=github" alt="Release"></a>
+  <a href="https://hub.docker.com/r/joker53/secure-kube"><img src="https://img.shields.io/docker/pulls/joker53/secure-kube?style=flat-square&color=blue&logo=docker" alt="Docker Pulls"></a>
+  <a href="https://github.com/KADHIRAVANEG/secure-kube/blob/main/LICENSE"><img src="https://img.shields.io/github/license/KADHIRAVANEG/secure-kube?style=flat-square&color=blue" alt="License"></a>
+  <br>
   <a href="https://kadhiravaneg.github.io/secure-kube/"><img src="https://img.shields.io/badge/docs-GitHub%20Pages-blue?style=flat-square&logo=materialformkdocs" alt="Documentation"></a>
+  <a href="https://kadhiravaneg.github.io/secure-kube/active-defense/"><img src="https://img.shields.io/badge/active%20defense-Falco%20Talon-purple?style=flat-square" alt="Active Defense"></a>
   <a href="https://kadhiravaneg.github.io/secure-kube/supply-chain/"><img src="https://img.shields.io/badge/SLSA-Level%203-success?style=flat-square&logo=sigstore" alt="SLSA Level 3"></a>
-  <a href="https://kadhiravaneg.github.io/secure-kube/active-defense/"><img src="https://img.shields.io/badge/Active%20Defense-Falco%20Talon-purple?style=flat-square" alt="Active Defense"></a>
-  <a href="https://github.com/KADHIRAVANEG/secure-kube/blob/main/LICENSE"><img src="https://img.shields.io/github/license/KADHIRAVANEG/secure-kube?style=flat-square" alt="License"></a>
-  <a href="https://hub.docker.com/r/joker53/secure-kube"><img src="https://img.shields.io/docker/pulls/joker53/secure-kube?style=flat-square&color=cyan" alt="Docker Pulls"></a>
+  <a href="https://kadhiravaneg.github.io/secure-kube/"><img src="https://img.shields.io/badge/CIS%201.30-passing-success?style=flat-square&logo=kubernetes" alt="CIS 1.30"></a>
 </p>
 
 <p align="center">
