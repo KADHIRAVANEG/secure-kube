@@ -48,9 +48,9 @@ gatekeeper: ## Step 4: Install OPA Gatekeeper + all constraint templates + const
 	helm repo update
 	helm upgrade --install gatekeeper gatekeeper/gatekeeper \
 		--namespace gatekeeper-system --create-namespace \
-		--wait --timeout 180s \
+		--wait --timeout 300s \
 		-f helm/gatekeeper-values.yaml
-	kubectl wait --for=condition=Available --timeout=120s -n gatekeeper-system deployment/gatekeeper-controller-manager
+	kubectl wait --for=condition=Available --timeout=180s -n gatekeeper-system deployment/gatekeeper-controller-manager
 	kubectl apply -f gatekeeper/constraint-templates/
 	@echo "→ Waiting for CRDs to register..."
 	sleep 8
