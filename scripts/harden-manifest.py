@@ -202,8 +202,15 @@ def main():
     if args.file == "-":
         content = sys.stdin.read()
     else:
-        with open(args.file, "r") as f:
-            content = f.read()
+        try:
+            with open(args.file, "r") as f:
+                content = f.read()
+        except FileNotFoundError:
+            sys.stderr.write(f"Error: File not found: {args.file}\n")
+            sys.exit(1)
+        except OSError as exc:
+            sys.stderr.write(f"Error reading '{args.file}': {exc}\n")
+            sys.exit(1)
 
     docs = list(yaml.safe_load_all(content))
     total_actions = 0

@@ -8,7 +8,7 @@ set -euo pipefail
 TARGET="${1:-}"
 NAMESPACE="${2:-default}"
 
-if [ -z "${TARGET}" ]; then
+if [ -z "${TARGET}" ] || [ "${TARGET}" = "-h" ] || [ "${TARGET}" = "--help" ]; then
   cat << EOF
 Usage:
   ./scripts/generate-network-policy.sh <pod-or-deployment> [namespace] [output-file]
@@ -17,7 +17,7 @@ Examples:
   ./scripts/generate-network-policy.sh secure-app default
   ./scripts/generate-network-policy.sh deployment/api-server prod -o api-netpol.yaml
 EOF
-  exit 1
+  [ -z "${TARGET}" ] && exit 1 || exit 0
 fi
 
 OUTPUT_FILE=""
