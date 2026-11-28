@@ -6,6 +6,8 @@ resources:
   - network-policies
   - rbac
 
-commonLabels:
-  app.kubernetes.io/part-of: securekube
-  app.kubernetes.io/managed-by: kustomize
+labels:
+  - includeSelectors: true
+    pairs:
+      app.kubernetes.io/part-of: securekube
+      app.kubernetes.io/managed-by: kustomize
